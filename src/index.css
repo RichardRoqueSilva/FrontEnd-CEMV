@@ -1,0 +1,74 @@
+:root {
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* =========================================
+   10. PÁGINA DA BÍBLIA
+   ========================================= */
+
+/* Controles (Selects) */
+.biblia-controls label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--cor-vinho-escuro);
+}
+
+/* Área do texto */
+.biblia-leitura {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-top: 20px;
+  min-height: 400px;
+}
+
+.titulo-capitulo {
+  text-align: center;
+  color: var(--cor-vinho-escuro);
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.versiculos-lista {
+  font-family: 'Georgia', 'Times New Roman', serif; /* Fonte serifada para leitura */
+  line-height: 1.8;
+  font-size: 1.15rem;
+  color: #333;
+}
+
+.versiculo {
+  margin-bottom: 15px;
+}
+
+/* Número do versículo pequeno e vermelho */
+.v-numero {
+  color: var(--cor-vermelho-vibrante);
+  font-weight: bold;
+  font-size: 0.8em;
+  vertical-align: super;
+  margin-right: 5px;
+}
+
+.mensagem-inicial {
+  text-align: center;
+  color: #777;
+  padding: 50px;
+  font-size: 1.2rem;
+}
+
+.loading {
+  text-align: center;
+  font-weight: bold;
+  color: var(--cor-vinho-medio);
+  padding: 20px;
+}

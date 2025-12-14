@@ -1,0 +1,184 @@
+/* Container Principal */
+.plano-container {
+  margin-bottom: 40px;
+  border-left: 5px solid #f1c40f !important;
+  background: white;
+  border-radius: 8px; /* Arredondar cantos */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+}
+
+/* Cabeçalho */
+.plano-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px; /* Mais espaçamento interno */
+  user-select: none;
+}
+
+.plano-header:hover { background-color: #fcfcfc; }
+
+.plano-titulo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.plano-header h2 { color: #2b0505; margin: 0; }
+
+.seta-plano {
+  font-size: 1.2rem;
+  color: #2b0505;
+  transition: transform 0.3s ease;
+  margin-left: auto;
+}
+.seta-plano.aberta { transform: rotate(180deg); }
+
+/* Conteúdo que abre */
+.plano-conteudo-animado {
+  animation: slideDown 0.4s ease-out;
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Configuração (Selects e Datas) */
+.plano-config {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+  justify-content: center; /* CENTRALIZA O CONTEÚDO */
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.plano-config div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.plano-config label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.select-plano, .input-data {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-weight: bold;
+  color: #2b0505;
+  outline: none;
+}
+.select-plano:focus, .input-data:focus { border-color: #a82626; }
+
+/* Barra de Progresso */
+.barra-progresso-container {
+  width: 100%;
+  height: 30px; /* Um pouco mais alta */
+  background-color: #e0e0e0;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 30px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.barra-progresso-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2b0505, #a82626);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.barra-texto {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 0 0 4px white;
+  white-space: nowrap;
+}
+
+/* Calendário e Meta */
+.calendario-area {
+  text-align: center; /* CENTRALIZA TUDO DENTRO */
+}
+
+.input-data.destaque {
+  border-color: #a82626;
+  background-color: #fff5f5;
+  text-align: center;
+  margin-left: 10px;
+}
+
+.meta-leitura {
+  background-color: #fff9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed #a82626;
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Garante que os botões fiquem no meio */
+}
+.meta-leitura .btn-save {
+    align-self: center !important; 
+    width: auto;
+    min-width: 250px; /* Um tamanho mínimo para ficar bonito */
+    margin-top: 20px;
+}
+
+.meta-titulo {
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #555;
+  font-size: 1.1rem;
+}
+
+.meta-lista {
+  display: flex;
+  justify-content: center; /* IMPORTANTE: Centraliza os botões */
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.chip-capitulo {
+  background-color: white;
+  border: 1px solid #2b0505;
+  color: #2b0505;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
+}
+.chip-capitulo:hover { background-color: #2b0505; color: white; }
+
+.divisor-leve {
+    border: 0; 
+    height: 1px; 
+    background: #eee; 
+    margin: 25px 0;
+}
+
+.btn-save {
+    width: auto;
+    padding: 10px 30px;
+    font-size: 1rem;
+}

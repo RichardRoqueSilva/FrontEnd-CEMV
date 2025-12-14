@@ -1,0 +1,372 @@
+/* =========================================
+   1. CORES E GLOBAIS (Identidade CEMV)
+   ========================================= */
+:root {
+  --cor-vinho-escuro: #2b0505;  /* Fundo escuro */
+  --cor-vinho-medio: #5a0b0b;   /* Tom intermediário */
+  --cor-vermelho-vibrante: #a82626; /* Detalhes e Botões */
+  --cor-laranja: #d35400;       /* Tag Agitada */
+  --cor-azul: #2c3e50;          /* Tag Lenta */
+  --cor-dourado: #f1c40f;       /* Detalhes Dourados */
+  --cor-texto-header: #ffffff;
+  --cor-fundo-site: #f4f4f4;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--cor-fundo-site);
+  color: #333;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================
+   2. CABEÇALHO (HEADER)
+   ========================================= */
+.header {
+  background: linear-gradient(90deg, #000000 0%, var(--cor-vinho-escuro) 60%, var(--cor-vinho-medio) 100%);
+  color: var(--cor-texto-header);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 10;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.navbar-logo {
+  height: 50px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: white;
+}
+
+/* Menu Mobile */
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.nav a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.nav a:hover {
+  color: #fff;
+  border-bottom: 2px solid var(--cor-vermelho-vibrante);
+}
+
+/* =========================================
+   3. CONTEÚDO PRINCIPAL
+   ========================================= */
+.main-content {
+  padding: 2rem 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex: 1;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--cor-vinho-escuro);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =========================================
+   4. BARRA DE AÇÕES (Inputs e Filtros)
+   ========================================= */
+.actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.search-input, .filter-select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input:focus, .filter-select:focus {
+  border-color: var(--cor-vinho-medio);
+  box-shadow: 0 0 5px rgba(90, 11, 11, 0.2);
+}
+
+.search-input { width: 100%; max-width: 300px; }
+.filter-select { background: white; cursor: pointer; max-width: 180px; }
+
+/* =========================================
+   5. FORMULÁRIO (Compartilhado)
+   ========================================= */
+.form-box {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-top: 5px solid var(--cor-vinho-medio);
+  max-width: 500px;
+  margin: 0 auto 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Helper para formulários em linha (usado no LeitorBiblia se necessário) */
+.form-box-row {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.form-box h2 {
+  text-align: center;
+  color: #333;
+}
+
+.form-box input, .form-box select, .form-box textarea, .form-box-row select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* =========================================
+   6. CARDS (Louvores)
+   ========================================= */
+.cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-left: 4px solid var(--cor-vinho-escuro);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.cantor-nome {
+  color: #555;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.agitada { background-color: var(--cor-laranja); }
+.lenta { background-color: var(--cor-azul); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--cor-vermelho-vibrante);
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  padding: 5px 0;
+  width: fit-content;
+}
+.btn-link:hover { text-decoration: underline; }
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  margin-top: auto;
+}
+
+/* =========================================
+   7. BOTÕES GERAIS
+   ========================================= */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-primary { background-color: var(--cor-vinho-escuro); color: white; }
+.btn-primary:hover { background-color: black; }
+
+.btn-save { background-color: var(--cor-vermelho-vibrante); color: white; width: 100%; }
+.btn-save:hover { background-color: #801f1f; }
+
+.btn-edit { background-color: #f39c12; color: white; }
+.btn-delete { background-color: #c0392b; color: white; }
+
+/* =========================================
+   8. MODAL DE LETRA (POPUP LOUVORES)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--cor-vinho-escuro);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-header {
+  padding: 15px 20px;
+  background-color: var(--cor-vinho-escuro);
+  color: white;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modal-header h2 { margin: 0; font-size: 1.2rem; color: white; }
+.btn-close-modal { background: none; border: none; color: white; font-size: 1.5rem; padding: 0; }
+
+.modal-body-letra {
+  padding: 25px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: center;
+  background-color: #fffbfc;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   9. RESPONSIVIDADE GERAL
+   ========================================= */
+@media (max-width: 768px) {
+  .header { flex-wrap: wrap; }
+  .menu-btn { display: block; }
+  
+  .nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    text-align: center;
+    background-color: var(--cor-vinho-escuro);
+    margin-top: 10px;
+    padding: 10px 0;
+  }
+  
+  .nav.ativo { display: flex; }
+  .nav a { margin: 10px 0; display: block; }
+  .filter-select { width: 100%; max-width: none; }
+}
+
+@media (min-width: 768px) {
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+  }
+  .btn-save { width: auto; align-self: flex-end; padding: 10px 40px; }
+}

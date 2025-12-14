@@ -1,0 +1,110 @@
+.form-contato-container {
+    background: white;
+    padding: 10px 30px; /* Menos padding vertical quando fechado */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    max-width: 800px;
+    margin: 0 auto;
+    border-left: 5px solid #a82626; /* Identidade Vermelha */
+    transition: all 0.3s;
+}
+
+/* Cabeçalho do Acordeão */
+.form-header-accordion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 0;
+    user-select: none;
+}
+
+.form-header-accordion:hover {
+    opacity: 0.8;
+}
+
+.titulo-form {
+    color: #2b0505;
+    margin: 0;
+    text-align: left; /* Alinha o título a esquerda junto com a seta */
+    font-size: 1.3rem;
+}
+
+/* Seta Animada */
+.seta-form {
+    font-size: 1.2rem;
+    color: #2b0505;
+    transition: transform 0.3s ease;
+}
+
+.seta-form.aberta {
+    transform: rotate(180deg);
+}
+
+/* Animação de Abrir */
+.form-animado {
+    animation: slideDown 0.4s ease-out;
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid do Formulário */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo.full-width { grid-column: 1 / -1; }
+
+.campo label {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.campo input, .campo textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border 0.3s;
+}
+
+.campo input:focus, .campo textarea:focus {
+    border-color: #a82626;
+    outline: none;
+}
+
+.btn-enviar {
+    grid-column: 1 / -1;
+    background-color: #2b0505;
+    color: white;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn-enviar:hover { background-color: #a82626; }
