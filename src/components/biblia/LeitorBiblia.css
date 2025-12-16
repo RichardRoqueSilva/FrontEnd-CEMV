@@ -1,5 +1,5 @@
 /* =========================================
-   ESTILOS DO LEITOR DA BÍBLIA (TEXT-TO-SPEECH)
+   ESTILOS DO LEITOR DA BÍBLIA
    ========================================= */
 
 /* Container Principal */
@@ -9,7 +9,7 @@
     width: 100%;
 }
 
-/* --- SELETOR DE LIVROS E CAPÍTULOS (Topo) --- */
+/* --- TOPO: SELETOR DE LIVROS --- */
 .form-box-row {
     background: white;
     padding: 20px;
@@ -19,7 +19,7 @@
     margin: 0 auto 20px auto;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: wrap; 
     gap: 15px;
 }
 
@@ -32,20 +32,19 @@
     color: #333;
     outline: none;
     background-color: #fff;
+    cursor: pointer;
 }
 
-.form-box-row select:focus {
-    border-color: #2b0505;
-}
+.form-box-row select:focus { border-color: #2b0505; }
 
 .form-box-row label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
-    color: #2b0505; /* Vinho Escuro */
+    color: #2b0505;
 }
 
-/* --- CAIXA DE LEITURA (Texto e Player) --- */
+/* --- ÁREA DE LEITURA E ÁUDIO --- */
 .biblia-leitura-box {
     background-color: white;
     padding: 30px;
@@ -53,104 +52,72 @@
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     margin-top: 20px;
     min-height: 400px;
-    border-top: 4px solid #5a0b0b; /* Vinho Médio */
+    border-top: 4px solid #5a0b0b;
 }
 
-/* --- BARRA DE CONTROLES DO ÁUDIO --- */
 .audio-controls-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    /* border-bottom removido daqui e colocado como HR no JSX para ficar mais limpo */
     flex-wrap: wrap;
     gap: 15px;
 }
 
 .titulo-capitulo-audio {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #2b0505;
+    margin: 0; 
+    font-size: 1.5rem; 
+    color: #2b0505; 
     text-transform: capitalize;
 }
 
-/* Grupo de Botões e Selects */
 .player-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap; /* Importante para não quebrar em telas pequenas */
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    flex-wrap: wrap;
 }
 
-/* Estilo dos Selects (Voz e Velocidade) */
 .select-velocidade {
-    padding: 8px 10px;
-    border-radius: 20px;
+    padding: 8px 10px; 
+    border-radius: 20px; 
     border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    font-size: 0.8rem;
+    background-color: #f9f9f9; 
+    font-size: 0.8rem; 
     cursor: pointer;
-    font-weight: bold;
-    color: #555;
-    outline: none;
+    font-weight: bold; 
+    color: #555; 
+    outline: none; 
     transition: 0.2s;
-    
-    /* Garante que nomes longos de voz não quebrem o layout */
     max-width: 150px; 
-    white-space: nowrap;
-    overflow: hidden;
+    white-space: nowrap; 
+    overflow: hidden; 
     text-overflow: ellipsis;
 }
+.select-velocidade:hover { border-color: #2b0505; }
 
-.select-velocidade:hover {
-    border-color: #2b0505;
-    background-color: #fff;
-}
-
-/* Botão Ouvir (Play) */
-.btn-play {
-    background-color: #2b0505; /* Vinho */
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
+.btn-play, .btn-stop {
+    color: white; 
+    padding: 8px 20px; 
+    border-radius: 20px; 
     border: none;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
+    font-weight: 600; 
+    cursor: pointer; 
+    display: flex; 
     align-items: center;
-    gap: 5px;
-    transition: all 0.2s;
-    font-size: 0.9rem;
+    gap: 8px; 
+    transition: all 0.2s; 
+    font-size: 0.9rem; 
     white-space: nowrap;
 }
+.btn-play { background-color: #2b0505; }
+.btn-stop { background-color: #a82626; }
+.btn-play:hover, .btn-stop:hover { transform: scale(1.05); }
 
-/* Botão Parar (Stop) */
-.btn-stop {
-    background-color: #a82626; /* Vermelho Vibrante */
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-    white-space: nowrap;
-}
-
-.btn-play:hover, .btn-stop:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* --- TEXTO BÍBLICO --- */
+/* --- TEXTO E NOTAS --- */
 .versiculos-lista {
-    font-family: 'Georgia', 'Times New Roman', serif; /* Fonte clássica para leitura */
+    font-family: 'Georgia', 'Times New Roman', serif;
     line-height: 1.8;
     font-size: 1.2rem;
     color: #333;
@@ -158,18 +125,36 @@
 }
 
 .versiculo {
-    margin-bottom: 15px;
+    margin-bottom: 15px; 
+    padding: 5px 8px; 
+    border-radius: 4px;
+    cursor: pointer; 
+    transition: background-color 0.2s; 
+    position: relative;
 }
+.versiculo:hover { background-color: #f5f5f5; }
 
 .v-numero {
-    color: #a82626; /* Vermelho para destacar o número */
-    font-weight: bold;
+    color: #a82626; 
+    font-weight: bold; 
     font-size: 0.75em;
-    vertical-align: super;
+    vertical-align: super; 
     margin-right: 8px;
 }
 
-/* Loading e Erros */
+.nota-usuario {
+    display: block; 
+    font-size: 0.9rem; 
+    color: #666; 
+    font-family: 'Segoe UI', sans-serif;
+    margin-top: 5px; 
+    padding-left: 10px; 
+    border-left: 3px solid #2b0505;
+    background-color: rgba(255,255,255,0.5); 
+    font-style: italic;
+}
+
+/* Loading */
 .loading {
     text-align: center;
     font-weight: bold;
@@ -178,42 +163,66 @@
     font-size: 1.1rem;
 }
 
-/* --- RESPONSIVIDADE (MOBILE) --- */
+/* --- MODAL DE EDIÇÃO --- */
+.editor-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+}
+.editor-box {
+    background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s;
+}
+.editor-titulo {
+    margin-top: 0; color: #2b0505; font-size: 1.2rem; margin-bottom: 15px;
+    border-bottom: 1px solid #eee; padding-bottom: 10px;
+}
+
+/* Grelha de Cores */
+.cores-grid { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+
+/* Botões de Cor (Com correção do X centralizado) */
+.btn-cor {
+    width: 35px; 
+    height: 35px; 
+    border-radius: 50%; 
+    border: 2px solid #ddd; 
+    cursor: pointer; 
+    transition: transform 0.2s;
+    
+    /* Flexbox para centralizar o X */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.9rem;
+}
+.btn-cor:hover, .btn-cor.selecionada { transform: scale(1.1); border-color: #333; }
+
+.input-nota {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+    font-family: sans-serif; margin-bottom: 15px; resize: vertical;
+}
+.editor-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Cores de Destaque */
+.bg-amarelo { background-color: #fff9c4; }
+.bg-verde { background-color: #dcedc8; }
+.bg-azul { background-color: #bbdefb; }
+.bg-rosa { background-color: #f8bbd0; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- RESPONSIVIDADE --- */
 @media (max-width: 600px) {
-    .biblia-leitura-box {
-        padding: 20px;
-    }
-
-    .audio-controls-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .titulo-capitulo-audio {
-        font-size: 1.3rem;
-    }
-
-    .player-actions {
-        width: 100%;
-        justify-content: space-between;
-        gap: 10px;
-    }
-
-    /* No celular, os selects crescem para ocupar espaço igual */
-    .select-velocidade {
-        flex: 1; 
-        max-width: 100%; /* Remove limite de largura no mobile */
-        text-align: center;
-    }
-
-    /* Botão ocupa a largura total ou divide espaço se preferir */
-    .btn-play, .btn-stop {
-        flex: 0 0 auto; /* Botão não estica, mantém tamanho do texto */
-    }
-
-    .versiculos-lista {
-        font-size: 1.1rem; /* Fonte levemente menor */
-        text-align: left; /* Justificado pode criar buracos em telas pequenas */
-    }
+    .biblia-leitura-box { padding: 15px; }
+    
+    .audio-controls-bar { flex-direction: column; align-items: flex-start; }
+    
+    .player-actions { width: 100%; justify-content: space-between; }
+    
+    .versiculos-lista { font-size: 1.1rem; text-align: left; }
+    
+    .form-box-row { gap: 10px; }
 }

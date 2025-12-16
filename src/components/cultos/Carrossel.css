@@ -1,0 +1,207 @@
+/* =========================================
+   CARROSSEL 5 FOTOS (Desktop)
+   ========================================= */
+
+.carrossel-wrapper {
+    width: 100%;
+    max-width: 1400px; /* Aumentei um pouco a largura máxima para caber 5 fotos */
+    margin: 0 auto;
+    text-align: center;
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+.carrossel-titulo {
+    color: #2b0505;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #f1c40f;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.carrossel-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.slides-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.btn-seta {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(43, 5, 5, 0.8);
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.btn-seta:hover { background-color: #f1c40f; color: #2b0505; }
+.esquerda { left: 10px; }
+.direita { right: 10px; }
+
+/* --- ESTILOS DOS SLIDES --- */
+.slide {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px; 
+    height: 466px;
+    transition: all 0.5s ease-in-out;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background-color: #000;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 1. ATIVO (CENTRO) */
+.slide.ativo {
+    z-index: 30; /* Mais alto */
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 15px 40px rgba(43, 5, 5, 0.5);
+    border: 2px solid #f1c40f;
+    cursor: zoom-in;
+}
+
+/* 2. VIZINHOS IMEDIATOS (Nível 2) */
+.slide.anterior {
+    z-index: 20;
+    opacity: 0.7;
+    /* Move para esquerda, atrás do central */
+    transform: translateX(-85%) scale(0.85); 
+    cursor: pointer;
+    filter: grayscale(30%) brightness(0.9);
+}
+
+.slide.proximo {
+    z-index: 20;
+    opacity: 0.7;
+    /* Move para direita, atrás do central */
+    transform: translateX(-15%) scale(0.85);
+    cursor: pointer;
+    filter: grayscale(30%) brightness(0.9);
+}
+
+/* 3. VIZINHOS DISTANTES (Nível 3 - O novo pedido) */
+.slide.anterior-2 {
+    z-index: 10;
+    opacity: 0.4; /* Bem mais transparente */
+    /* Move bem para a esquerda */
+    transform: translateX(-120%) scale(0.7); 
+    cursor: pointer;
+    filter: grayscale(80%) brightness(0.7);
+}
+
+.slide.proximo-2 {
+    z-index: 10;
+    opacity: 0.4;
+    /* Move bem para a direita */
+    transform: translateX(20%) scale(0.7);
+    cursor: pointer;
+    filter: grayscale(80%) brightness(0.7);
+}
+
+/* 4. RESTO */
+.slide.oculto {
+    z-index: 0;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+}
+
+/* Indicadores */
+.indicadores {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.bolinha {
+    width: 10px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.bolinha.ativa {
+    background-color: #2b0505;
+    transform: scale(1.3);
+}
+
+/* Lightbox */
+.lightbox-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+.lightbox-img {
+    max-width: 90vw; max-height: 90vh;
+    border-radius: 5px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    border: 2px solid white;
+}
+.lightbox-close {
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: none; color: white;
+    font-size: 2.5rem; cursor: pointer; transition: 0.3s;
+}
+.lightbox-close:hover { color: #f1c40f; transform: scale(1.1); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* =========================================
+   RESPONSIVIDADE (MOBILE)
+   ========================================= */
+@media (max-width: 768px) {
+    .carrossel-container { height: 400px; }
+    .slide { width: 260px; height: 346px; }
+    
+    /* Mobile: Mantém apenas 3 fotos visíveis */
+    .slide.anterior { transform: translateX(-105%) scale(0.8); opacity: 0.5; }
+    .slide.proximo { transform: translateX(5%) scale(0.8); opacity: 0.5; }
+    
+    /* ESCONDE AS FOTOS EXTRAS NO CELULAR */
+    .slide.anterior-2, 
+    .slide.proximo-2 {
+        opacity: 0;
+        z-index: -1;
+        transform: translateX(-50%) scale(0.5); /* Joga pro fundo */
+    }
+    
+    .btn-seta { width: 40px; height: 40px; font-size: 1.2rem; }
+    .esquerda { left: 5px; }
+    .direita { right: 5px; }
+}

@@ -15,7 +15,7 @@ function CardLouvor({ louvor, aoEditar, aoExcluir, aoVerLetra }) {
       
       {louvor.letra && (
         <button className="btn-link" onClick={() => aoVerLetra(louvor)}>
-            Ver Letra Completa 👁️
+            Ver Letra Completa
         </button>
       )}
 

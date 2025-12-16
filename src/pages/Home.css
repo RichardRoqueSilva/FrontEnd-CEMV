@@ -1,0 +1,134 @@
+/* =========================================
+   ESTILOS DA HOME (PADRÃO CULTOS)
+   ========================================= */
+
+/* --- TÍTULOS PADRONIZADOS (Igual Cultos) --- */
+.home-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.home-titulo {
+    color: #2b0505;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #f1c40f; /* A famosa linha dourada */
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.home-subtitulo {
+    color: #666;
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* --- DIVISOR DE SEÇÕES --- */
+.home-divisor {
+    max-width: 200px;
+    margin: 60px auto; /* Espaçamento vertical generoso */
+    border: 0;
+    border-top: 1px solid #f1c40f; /* Linha fina dourada */
+    opacity: 0.6;
+}
+
+/* --- SEÇÃO BIOGRAFIA (CONTAINER CLEAN) --- */
+.pastores-section {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.pastores-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Sombra suave igual Cultos */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 40px;
+    border: 1px solid #eee;
+}
+
+/* Área da Foto */
+.pastores-img-container {
+    flex: 1;
+    max-width: 350px; /* Tamanho controlado */
+}
+
+.pastores-foto {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    border: 2px solid #2b0505; /* Borda Vinho para destacar */
+}
+
+/* Placeholder caso não tenha foto */
+.placeholder-foto {
+    width: 100%;
+    height: 350px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    border-radius: 8px;
+    color: #ccc;
+    border: 2px dashed #ddd;
+}
+
+/* Área do Texto */
+.pastores-info {
+    flex: 1.5;
+    text-align: left;
+}
+
+.bio-titulo {
+    color: #2b0505;
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.texto-bio {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #555;
+    text-align: justify;
+}
+
+.destaque-texto {
+    color: #a82626; /* Vermelho vibrante */
+    font-weight: bold;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .pastores-card {
+        flex-direction: column; /* Foto em cima, texto embaixo */
+        padding: 25px;
+        gap: 25px;
+    }
+
+    .pastores-img-container {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .pastores-info {
+        text-align: center;
+    }
+    
+    .texto-bio {
+        text-align: left; /* Mantém leitura confortável */
+    }
+    
+    .bio-titulo {
+        text-align: center;
+    }
+}

@@ -74,7 +74,8 @@ function Louvores() {
 
   return (
     <div className="main-content">
-      <h1>Ministério de Louvor</h1>
+      {/* ALTERAÇÃO AQUI: Classe page-title */}
+      <h1 className="page-title">Ministério de Louvor</h1>
 
       {/* Barra de Ações (Pode virar componente depois se quiser) */}
       <div className="actions-bar">

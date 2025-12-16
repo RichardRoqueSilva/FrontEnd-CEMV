@@ -1,27 +1,27 @@
 import { useState } from 'react'
 import PlanoLeitura from '../components/biblia/PlanoLeitura'
 import LeitorBiblia from '../components/biblia/LeitorBiblia'
+import '../App.css'
 
 function Biblia() {
-  // Estado para comunicar o Plano com o Leitor
   const [leituraAtiva, setLeituraAtiva] = useState({ livro: null, cap: null })
 
-  // Função chamada quando clica num capítulo do plano
   const abrirNoLeitor = (livro, cap) => {
     setLeituraAtiva({ livro, cap })
-    // Scroll suave até o leitor
-    window.scrollTo({ top: 400, behavior: 'smooth' })
+    window.scrollTo({ top: 600, behavior: 'smooth' })
   }
 
   return (
     <div className="main-content">
       
-      {/* Componente 1: Plano e Calendário */}
-      <PlanoLeitura aoSelecionarCapitulo={abrirNoLeitor} />
+      {/* Título Plano */}
+      <h1 className="page-title">Plano de Leitura</h1>
       
-      <hr style={{border: 0, height:'1px', background:'#ddd', margin:'30px 0'}} />
+      <PlanoLeitura aoSelecionarCapitulo={abrirNoLeitor} />
 
-      {/* Componente 2: Leitor do Texto */}
+      {/* Título Bíblia (Adicionei um margin-top para dar um respiro sem a linha) */}
+      <h1 className="page-title" style={{marginTop: '50px'}}>Bíblia Sagrada Online</h1>
+
       <LeitorBiblia 
          livroInicial={leituraAtiva.livro} 
          capInicial={leituraAtiva.cap} 

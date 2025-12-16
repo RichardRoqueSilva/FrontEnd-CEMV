@@ -1,0 +1,103 @@
+.palavra-container {
+    background: linear-gradient(135deg, #ffffff 0%, #fffbfb 100%);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-top: 5px solid #2b0505; /* Vinho */
+    position: relative;
+}
+
+/* Ícone de café decorativo de fundo */
+.palavra-container::before {
+    content: '☕';
+    position: absolute;
+    top: -20px;
+    right: 20px;
+    font-size: 8rem;
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.palavra-header {
+    background-color: #2b0505;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.palavra-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.data-hoje {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-style: italic;
+    text-transform: capitalize;
+}
+
+.palavra-content {
+    padding: 30px;
+    text-align: center;
+}
+
+.versiculo-texto {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.versiculo-ref {
+    font-weight: bold;
+    color: #a82626; /* Vermelho */
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #eee;
+    border-top: 3px solid #2b0505;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-share {
+    background-color: #25D366; /* Cor do WhatsApp */
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+}
+
+.btn-share:hover {
+    background-color: #1ebc57;
+    transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .versiculo-texto {
+        font-size: 1.2rem;
+    }
+}

@@ -341,7 +341,50 @@ button {
 }
 
 /* =========================================
-   9. RESPONSIVIDADE GERAL
+   10. PADRÕES VISUAIS GLOBAIS (NOVO)
+   ========================================= */
+
+/* Título Padrão das Páginas */
+.page-title {
+    color: var(--cor-vinho-escuro);
+    margin-bottom: 30px;
+    font-size: 2rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    /* A linha dourada embaixo */
+    border-bottom: 2px solid var(--cor-dourado);
+    display: inline-block; /* Faz a linha ficar do tamanho do texto */
+    padding-bottom: 10px;
+    
+    /* Centralização do bloco */
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Divisor de Seções (Linha fina) */
+.section-divider {
+    max-width: 200px;
+    margin: 50px auto; /* Espaço em cima e embaixo */
+    border: 0;
+    border-top: 1px solid var(--cor-dourado);
+    opacity: 0.6;
+}
+
+/* Container Branco Padrão (Box Clean) */
+.content-box-clean {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid #eee;
+}
+
+/* =========================================
+   11. RESPONSIVIDADE GERAL
    ========================================= */
 @media (max-width: 768px) {
   .header { flex-wrap: wrap; }

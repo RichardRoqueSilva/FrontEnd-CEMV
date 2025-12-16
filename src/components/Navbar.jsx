@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../App.css'
 // Importando a imagem da pasta assets
-import logoImg from '../assets/img/logo-removebg.jpeg' 
+import logoImg from '../assets/img/logo-teste2.jpeg' 
 
 function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false)
