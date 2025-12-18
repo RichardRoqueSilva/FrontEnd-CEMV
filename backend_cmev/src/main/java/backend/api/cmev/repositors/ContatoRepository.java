@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ContatoRepository extends JpaRepository<Contato, Long> {
-    // Pronto! Já temos save, findAll, delete, etc.
 }

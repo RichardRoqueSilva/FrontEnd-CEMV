@@ -1,0 +1,48 @@
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(90deg, #000000 0%, #2b0505 100%); /* Mesmo gradiente do Header */
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 1000;
+    border-top: 2px solid #f1c40f; /* Linha dourada fina */
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+    font-size: 0.85rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; /* Garante que não quebre em celulares muito pequenos */
+}
+
+.divisor {
+    color: #f1c40f; /* Dourado */
+    font-weight: bold;
+}
+
+.footer-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.footer-link:hover {
+    color: #f1c40f;
+    text-decoration: underline;
+}
+
+/* Ajuste para celular */
+@media (max-width: 480px) {
+    .footer-fixed {
+        font-size: 0.75rem;
+        padding: 8px 0;
+    }
+}

@@ -1,0 +1,97 @@
+.pix-card-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
+    border-top: 5px solid #2b0505;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.pix-img-wrapper {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 2px;
+    border-bottom: 1px solid #eee;
+    /* Garante que a imagem fique centralizada */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- AJUSTE DE TAMANHO AQUI --- */
+.pix-image {
+    width: 100%;          /* Responsivo: diminui se a tela for menor que 400 */
+    max-width: 200px;     /* TRAVA O TAMANHO EM 400PX */
+    height: auto;         /* Mantém a proporção (não estica) */
+    
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    display: block;
+}
+
+.pix-info {
+    padding: 30px;
+    width: 100%;
+}
+
+.pix-info h3 {
+    color: #2b0505;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+}
+
+.chave-box {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    margin: 15px 0 25px 0;
+    border: 2px dashed #a82626;
+    word-break: break-all;
+}
+
+.btn-copiar {
+    background-color: #2b0505;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-copiar:hover {
+    background-color: black;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-copiar.sucesso {
+    background-color: #27ae60;
+    pointer-events: none;
+}
+
+.instrucao {
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+    .chave-box {
+        font-size: 1.1rem;
+    }
+}

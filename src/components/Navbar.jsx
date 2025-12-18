@@ -27,6 +27,7 @@ function Navbar() {
         <Link to="/biblia" onClick={() => setMenuAberto(false)}>Bíblia</Link>
         <Link to="/cultos" onClick={() => setMenuAberto(false)}>Cultos</Link>
         <Link to="/louvores" onClick={() => setMenuAberto(false)}>Louvores</Link>
+        <Link to="/contribuicao" onClick={() => setMenuAberto(false)}>Contribuição</Link>
         <Link to="/contato" onClick={() => setMenuAberto(false)}>Contato</Link>
       </nav>
     </header>
