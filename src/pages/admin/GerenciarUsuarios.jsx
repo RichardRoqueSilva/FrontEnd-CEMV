@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import '../../App.css'
+import './GerenciarUsuarios.css'
 
 function GerenciarUsuarios() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [usuarios, setUsuarios] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Proteção: Se não for admin, chuta para home
   useEffect(() => {
-    if (!user || user.role !== 'ADMIN') {
-        alert("Acesso negado.")
+    // SEGURANÇA: Só PASTOR entra aqui
+    if (!user || user.role !== 'PASTOR') {
+        alert("Área restrita à liderança pastoral.")
         navigate('/')
     } else {
         carregarUsuarios()
@@ -20,56 +21,86 @@ function GerenciarUsuarios() {
 
   const carregarUsuarios = () => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+    setLoading(true)
     fetch(`${apiUrl}/api/usuarios`)
       .then(res => res.json())
-      .then(data => setUsuarios(data))
-      .catch(console.error)
+      .then(data => {
+          // Ordena: Pastor primeiro, depois Admin, depois Membro
+          const ordem = { 'PASTOR': 1, 'ADMIN': 2, 'MEMBER': 3 }
+          const ordenados = data.sort((a, b) => ordem[a.role] - ordem[b.role])
+          setUsuarios(ordenados)
+          setLoading(false)
+      })
+      .catch(err => {
+          console.error(err)
+          setLoading(false)
+      })
   }
 
-  const alterarPermissao = (id, roleAtual) => {
-    const novaRole = roleAtual === 'ADMIN' ? 'MEMBER' : 'ADMIN'
-    const acao = novaRole === 'ADMIN' ? 'promover para PASTOR/ADMIN' : 'rebaixar para MEMBRO'
-    
-    if (confirm(`Tem certeza que deseja ${acao}?`)) {
+  const mudarCargo = (id, novoCargo, nomeUsuario) => {
+    if (confirm(`Confirmar alteração de ${nomeUsuario} para ${novoCargo}?`)) {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
         
         fetch(`${apiUrl}/api/usuarios/${id}/role`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(novaRole)
+            body: novoCargo // Envia string pura
         })
-        .then(() => {
-            alert("Permissão alterada com sucesso!")
-            carregarUsuarios()
-        })
+        .then(() => carregarUsuarios())
+        .catch(err => alert("Erro ao alterar."))
     }
   }
 
   return (
     <div className="main-content">
-      <h1 className="page-title">Gerenciar Usuários</h1>
+      <h1 className="page-title">Gestão Pastoral</h1>
       
-      <div className="cards-grid">
-        {usuarios.map(u => (
-            <div key={u.id} className="card" style={{borderLeft: u.role === 'ADMIN' ? '4px solid #2b0505' : '4px solid #ccc'}}>
-                <h3>{u.nome}</h3>
-                <p>{u.email}</p>
-                <p><strong>Status:</strong> {u.role === 'ADMIN' ? 'Pastor/Admin' : 'Membro'}</p>
-                
-                {/* Não permite alterar o próprio usuário para não se trancar para fora */}
-                {u.email !== user?.email && (
-                    <div className="card-actions">
-                        <button 
-                            className={u.role === 'ADMIN' ? 'btn-delete' : 'btn-save'}
-                            onClick={() => alterarPermissao(u.id, u.role)}
-                        >
-                            {u.role === 'ADMIN' ? 'Remover Admin' : 'Tornar Admin'}
-                        </button>
+      {loading ? (
+          <p style={{textAlign:'center'}}>Carregando...</p>
+      ) : (
+          <div className="gestao-container">
+            <div className="users-grid">
+                {usuarios.map(u => (
+                    <div key={u.id} className={`user-card ${u.role.toLowerCase()}`}>
+                        <div className="user-header">
+                            <div className="user-avatar">
+                                {u.role === 'PASTOR' ? '✝️' : u.role === 'ADMIN' ? '🛠️' : '👤'}
+                            </div>
+                            
+                            {/* BADGES */}
+                            {u.role === 'PASTOR' && <span className="badge badge-pastor">Pastor</span>}
+                            {u.role === 'ADMIN' && <span className="badge badge-admin">Liderança/Mídia</span>}
+                            {u.role === 'MEMBER' && <span className="badge badge-member">Membro</span>}
+                        </div>
+
+                        <div className="user-info">
+                            <h3>{u.nome}</h3>
+                            <span className="user-email">{u.email}</span>
+                        </div>
+                        
+                        <div className="user-actions">
+                            {u.email === user?.email ? (
+                                <span className="user-self">Você (Pastor Logado)</span>
+                            ) : (
+                                <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
+                                    <label style={{fontSize:'0.8rem', fontWeight:'bold'}}>Alterar Cargo:</label>
+                                    <select 
+                                        value={u.role} 
+                                        onChange={(e) => mudarCargo(u.id, e.target.value, u.nome)}
+                                        className="select-cargo"
+                                    >
+                                        <option value="MEMBER">Membro</option>
+                                        <option value="ADMIN">Admin (Mídia)</option>
+                                        <option value="PASTOR">Pastor</option>
+                                    </select>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                )}
+                ))}
             </div>
-        ))}
-      </div>
+          </div>
+      )}
     </div>
   )
 }

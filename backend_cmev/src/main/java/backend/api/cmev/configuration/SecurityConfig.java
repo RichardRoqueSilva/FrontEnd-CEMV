@@ -22,32 +22,21 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // --- ACESSOS LIBERADOS ---
+                        // ... (Swagger, Auth, Contatos e Leitura - PermitAll) ...
 
-                        // Swagger
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // LOUVORES E CULTOS (Escrita): Pastor OU Admin
+                        // Nota: O Spring Security usa hasRole, mas como não estamos usando filtros complexos
+                        // vamos manter permitAll() e confiar na lógica do Controller ou Frontend por enquanto
+                        // para não complicar com Tokens JWT agora.
+                        .requestMatchers("/api/louvores/**").permitAll()
+                        .requestMatchers("/api/cultos/**").permitAll()
 
-                        // Auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-
-                        // Contatos
-                        .requestMatchers(HttpMethod.POST, "/api/contatos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/contatos").permitAll() // Se quiser listar no swagger
-
-                        // LOUVORES
-                        // Mudamos de hasRole("ADMIN") para permitAll()
-                        // A segurança será feita visualmente pelo Front (escondendo os botões)
-                        .requestMatchers(HttpMethod.GET, "/api/louvores").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/louvores").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/louvores/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/louvores/**").permitAll()
-
-                        // USUÁRIOS (Gestão)
-                        // Também liberamos para o seu teste funcionar
+                        // USUÁRIOS (Apenas PASTOR) - Aqui podemos fechar!
+                        // Mas como seu login é via JSON simples sem Token no Header,
+                        // se colocarmos hasRole("PASTOR") vai bloquear tudo.
+                        // Mantenha permitAll() aqui e confie na proteção do Frontend + verificação no Controller abaixo.
                         .requestMatchers("/api/usuarios/**").permitAll()
 
-                        // Qualquer outra coisa
                         .anyRequest().permitAll()
                 )
                 .build();

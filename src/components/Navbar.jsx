@@ -38,15 +38,15 @@ function Navbar() {
         <Link to="/contato" onClick={fecharMenu}>Contato</Link>
 
         {/* Link de Gestão (APENAS PARA ADMIN) */}
-        {user && user.role === 'ADMIN' && (
-            <Link 
-                to="/admin/usuarios" 
-                onClick={fecharMenu} 
-                style={{color:'#f1c40f', borderBottom: '1px dashed #f1c40f'}}
-            >
-                ⚙️ Gestão
-            </Link>
-        )}
+        {user && user.role === 'PASTOR' && (
+          <Link 
+              to="/admin/usuarios" 
+              onClick={fecharMenu} 
+              style={{color:'#f1c40f', borderBottom: '1px dashed #f1c40f'}}
+          >
+              ⚙️ Gestão Pastoral
+          </Link>
+      )}
 
         {/* Área do Usuário */}
         {user ? (

@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import CardLouvor from '../components/louvores/CardLouvor'
 import FormLouvor from '../components/louvores/FormLouvor'
 import ModalLetra from '../components/louvores/ModalLetra'
-import { useAuth } from '../context/AuthContext' // <--- Importar Contexto
+import { useAuth } from '../context/AuthContext'
 import '../App.css'
 
 function Louvores() {
-  const { user } = useAuth() // Pega o usuário logado
-  const isAdmin = user?.role === 'ADMIN' // Verifica permissão
+  const { user } = useAuth()
+  
+  // --- NOVA LÓGICA DE PERMISSÃO ---
+  // Permite edição se for Pastor OU Admin (Equipe de Mídia/Liderança)
+  const isStaff = user?.role === 'PASTOR' || user?.role === 'ADMIN'
 
   const [louvores, setLouvores] = useState([])
   const [busca, setBusca] = useState('')
@@ -23,7 +26,6 @@ function Louvores() {
   useEffect(() => { carregarLouvores() }, [])
 
   const carregarLouvores = () => {
-    // Usar variável de ambiente ou localhost
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
     fetch(`${apiUrl}/api/louvores`)
       .then(res => res.json())
@@ -33,8 +35,8 @@ function Louvores() {
 
   const handleSalvar = (e) => {
     e.preventDefault()
-    // Segurança extra: não deixa salvar se não for admin
-    if (!isAdmin) return alert("Apenas administradores podem realizar esta ação.")
+    // Proteção no Front: só Staff pode salvar
+    if (!isStaff) return alert("Apenas a liderança pode realizar esta ação.")
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
     const metodo = form.id ? 'PUT' : 'POST'
@@ -56,7 +58,7 @@ function Louvores() {
   }
 
   const handleExcluir = (id) => {
-    if (!isAdmin) return // Segurança
+    if (!isStaff) return
     if (confirm('Tem certeza?')) {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
       fetch(`${apiUrl}/api/louvores/${id}`, { method: 'DELETE' })
@@ -65,7 +67,7 @@ function Louvores() {
   }
 
   const handleEditar = (louvor) => {
-    if (!isAdmin) return // Segurança
+    if (!isStaff) return
     setForm({ ...louvor, letra: louvor.letra || '' }) 
     setMostrarForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -98,15 +100,15 @@ function Louvores() {
             <option value="LENTA">Lentas</option>
         </select>
         
-        {/* BOTÃO NOVO: Só aparece para ADMIN */}
-        {isAdmin && (
+        {/* Botão Novo: Visível para PASTOR e ADMIN */}
+        {isStaff && (
             <button className="btn-primary" onClick={() => { limparForm(); setMostrarForm(!mostrarForm) }}>
             {mostrarForm ? 'Cancelar' : '+ Novo'}
             </button>
         )}
       </div>
 
-      {mostrarForm && isAdmin && (
+      {mostrarForm && isStaff && (
         <FormLouvor 
             form={form} 
             setForm={setForm} 
@@ -125,7 +127,8 @@ function Louvores() {
             aoEditar={handleEditar}
             aoExcluir={handleExcluir}
             aoVerLetra={setLouvorModal}
-            adminMode={isAdmin} // <--- Passa a permissão para o card
+            // Passa a permissão combinada para exibir botões de editar/excluir
+            adminMode={isStaff} 
           />
         ))}
       </div>
