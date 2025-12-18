@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { BIBLIA_COMPLETA, BIBLIA_CRONOLOGICA } from '../../utils/dadosBiblia'
 import './PlanoLeitura.css'
 
-function PlanoLeitura({ aoSelecionarCapitulo }) {
+function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
   
-  // Função auxiliar para pegar a data de HOJE no formato YYYY-MM-DD local (Brasil)
+  // Função auxiliar para pegar a data de HOJE no formato YYYY-MM-DD local
   const pegarDataHojeLocal = () => {
     const hoje = new Date()
     const offset = hoje.getTimezoneOffset()
@@ -12,39 +12,39 @@ function PlanoLeitura({ aoSelecionarCapitulo }) {
     return dataLocal.toISOString().split('T')[0]
   }
 
+  // Estado de Configuração (Persistido no LocalStorage)
   const [config, setConfig] = useState(() => {
     const salvo = localStorage.getItem('cemv_plano')
     return salvo ? JSON.parse(salvo) : {
       diasPlano: 365,
       capitulosLidos: 0,
-      dataInicio: pegarDataHojeLocal(), // Usa data local corrigida
+      dataInicio: pegarDataHojeLocal(),
       tipoOrdem: 'BIBLICA'
     }
   })
 
   const [planoAberto, setPlanoAberto] = useState(false)
-  const [dataConsulta, setDataConsulta] = useState(pegarDataHojeLocal()) // Inicia com hoje
+  const [dataConsulta, setDataConsulta] = useState(pegarDataHojeLocal())
 
+  // Salva no storage sempre que mudar
   useEffect(() => {
     localStorage.setItem('cemv_plano', JSON.stringify(config))
   }, [config])
 
+  // Lógica do Plano
   const listaAtual = config.tipoOrdem === 'CRONOLOGICA' ? BIBLIA_CRONOLOGICA : BIBLIA_COMPLETA
   const capsPorDia = Math.ceil(1189 / config.diasPlano)
   const porcentagem = Math.min(100, Math.floor((config.capitulosLidos / 1189) * 100))
 
-  // --- CÁLCULO DE DIAS CORRIGIDO (Ignora horas para não errar o dia) ---
+  // Lógica do Calendário (Dias Corridos)
   const calcularMetaDoDia = (data) => {
-    // Cria datas "limpas" (meia-noite) para evitar erro de fuso horário
     const inicioParts = config.dataInicio.split('-')
     const dataInicio = new Date(inicioParts[0], inicioParts[1] - 1, inicioParts[2])
 
     const atualParts = data.split('-')
     const dataAtual = new Date(atualParts[0], atualParts[1] - 1, atualParts[2])
     
-    // Diferença em milissegundos
     const diffTempo = dataAtual - dataInicio
-    // Converte para dias (arredondando para baixo para ser exato)
     const diffDias = Math.floor(diffTempo / (1000 * 60 * 60 * 24))
     
     if (diffDias < 0) return []
@@ -115,9 +115,8 @@ function PlanoLeitura({ aoSelecionarCapitulo }) {
                     </select>
                 </div>
                 
-                {/* AQUI ESTÁ O INICIADOR QUE VOCÊ PEDIU */}
                 <div>
-                    <label>Início do Plano:</label>
+                    <label>Início:</label>
                     <input 
                         type="date" 
                         value={config.dataInicio}
@@ -175,11 +174,23 @@ function PlanoLeitura({ aoSelecionarCapitulo }) {
                         </p>
                     )}
 
-                    <button className="btn-save" onClick={marcarComoLido}>
-                        ✅ Marcar Leitura de Hoje como Lida
-                    </button>
+                    {/* BOTÃO CONDICIONAL DE PERMISSÃO */}
+                    {podeRegistrar ? (
+                        <button className="btn-save" onClick={marcarComoLido}>
+                            ✅ Marcar Leitura de Hoje como Lida
+                        </button>
+                    ) : (
+                        <div style={{marginTop: '20px', padding: '10px', backgroundColor: '#f9f9f9', borderTop: '1px solid #eee'}}>
+                            <p style={{color: '#777', fontStyle: 'italic', marginBottom: '5px'}}>
+                                🔒 Faça login para salvar seu progresso.
+                            </p>
+                            <a href="/login" className="btn-link" style={{fontSize: '1rem'}}>
+                                Ir para Login
+                            </a>
+                        </div>
+                    )}
                     
-                    {config.capitulosLidos > 0 && (
+                    {podeRegistrar && config.capitulosLidos > 0 && (
                          <button className="btn-link" style={{fontSize: '0.8rem', marginTop:'10px', alignSelf:'center'}} onClick={reiniciarPlano}>
                             Reiniciar Plano
                          </button>

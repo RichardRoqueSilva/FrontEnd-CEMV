@@ -2,17 +2,19 @@ import { useState, useEffect } from 'react'
 import CardLouvor from '../components/louvores/CardLouvor'
 import FormLouvor from '../components/louvores/FormLouvor'
 import ModalLetra from '../components/louvores/ModalLetra'
-
-// Note: Não importamos CSS aqui, pois cada componente já tem o seu
-// Apenas o CSS global de layout (grids) que ainda pode estar no App.css
+import { useAuth } from '../context/AuthContext' // <--- Importar Contexto
+import '../App.css'
 
 function Louvores() {
+  const { user } = useAuth() // Pega o usuário logado
+  const isAdmin = user?.role === 'ADMIN' // Verifica permissão
+
   const [louvores, setLouvores] = useState([])
   const [busca, setBusca] = useState('')
   const [filtroEstilo, setFiltroEstilo] = useState('TODOS')
   
   const [mostrarForm, setMostrarForm] = useState(false)
-  const [louvorModal, setLouvorModal] = useState(null) // Para o Modal
+  const [louvorModal, setLouvorModal] = useState(null)
 
   const [form, setForm] = useState({
     id: null, nomeMusica: '', nomeCantor: '', estilo: 'AGITADA', letra: ''
@@ -21,7 +23,9 @@ function Louvores() {
   useEffect(() => { carregarLouvores() }, [])
 
   const carregarLouvores = () => {
-    fetch('http://localhost:8080/api/louvores')
+    // Usar variável de ambiente ou localhost
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+    fetch(`${apiUrl}/api/louvores`)
       .then(res => res.json())
       .then(data => setLouvores(data))
       .catch(err => console.error(err))
@@ -29,8 +33,12 @@ function Louvores() {
 
   const handleSalvar = (e) => {
     e.preventDefault()
+    // Segurança extra: não deixa salvar se não for admin
+    if (!isAdmin) return alert("Apenas administradores podem realizar esta ação.")
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
     const metodo = form.id ? 'PUT' : 'POST'
-    const url = form.id ? `http://localhost:8080/api/louvores/${form.id}` : 'http://localhost:8080/api/louvores'
+    const url = form.id ? `${apiUrl}/api/louvores/${form.id}` : `${apiUrl}/api/louvores`
 
     fetch(url, {
       method: metodo,
@@ -48,13 +56,16 @@ function Louvores() {
   }
 
   const handleExcluir = (id) => {
+    if (!isAdmin) return // Segurança
     if (confirm('Tem certeza?')) {
-      fetch(`http://localhost:8080/api/louvores/${id}`, { method: 'DELETE' })
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+      fetch(`${apiUrl}/api/louvores/${id}`, { method: 'DELETE' })
         .then(() => carregarLouvores())
     }
   }
 
   const handleEditar = (louvor) => {
+    if (!isAdmin) return // Segurança
     setForm({ ...louvor, letra: louvor.letra || '' }) 
     setMostrarForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -64,7 +75,6 @@ function Louvores() {
     setForm({ id: null, nomeMusica: '', nomeCantor: '', estilo: 'AGITADA', letra: '' })
   }
 
-  // Lógica de Filtro
   const louvoresFiltrados = louvores.filter(l => {
     const texto = busca.toLowerCase()
     const matchTexto = l.nomeMusica.toLowerCase().includes(texto) || l.nomeCantor.toLowerCase().includes(texto) || (l.letra && l.letra.toLowerCase().includes(texto))
@@ -74,10 +84,8 @@ function Louvores() {
 
   return (
     <div className="main-content">
-      {/* ALTERAÇÃO AQUI: Classe page-title */}
       <h1 className="page-title">Ministério de Louvor</h1>
 
-      {/* Barra de Ações (Pode virar componente depois se quiser) */}
       <div className="actions-bar">
         <input 
           type="text" placeholder="Buscar música, cantor ou trecho..." 
@@ -89,13 +97,16 @@ function Louvores() {
             <option value="AGITADA">Agitadas</option>
             <option value="LENTA">Lentas</option>
         </select>
-        <button className="btn-primary" onClick={() => { limparForm(); setMostrarForm(!mostrarForm) }}>
-          {mostrarForm ? 'Cancelar' : '+ Novo'}
-        </button>
+        
+        {/* BOTÃO NOVO: Só aparece para ADMIN */}
+        {isAdmin && (
+            <button className="btn-primary" onClick={() => { limparForm(); setMostrarForm(!mostrarForm) }}>
+            {mostrarForm ? 'Cancelar' : '+ Novo'}
+            </button>
+        )}
       </div>
 
-      {/* Renderiza o Formulário ou a Lista */}
-      {mostrarForm && (
+      {mostrarForm && isAdmin && (
         <FormLouvor 
             form={form} 
             setForm={setForm} 
@@ -113,17 +124,16 @@ function Louvores() {
             louvor={louvor}
             aoEditar={handleEditar}
             aoExcluir={handleExcluir}
-            aoVerLetra={setLouvorModal} // Passa a função que abre o modal
+            aoVerLetra={setLouvorModal}
+            adminMode={isAdmin} // <--- Passa a permissão para o card
           />
         ))}
       </div>
 
-      {/* Modal fica aqui quietinho esperando ser chamado */}
       <ModalLetra 
         louvor={louvorModal} 
         aoFechar={() => setLouvorModal(null)} 
       />
-
     </div>
   )
 }

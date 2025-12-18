@@ -11,22 +11,34 @@ function PalavraDoDia() {
     const refDoDia = getVersiculoDoDia()
     setReferencia(refDoDia)
 
-    // Busca o texto na API
-    fetch(`https://bible-api.com/${refDoDia}?translation=almeida`)
-      .then(res => res.json())
-      .then(data => {
-        setTexto(data.text)
+    // LÓGICA DE CACHE
+    const dataHoje = new Date().toISOString().split('T')[0]
+    const chaveCache = `cemv_palavra_${dataHoje}`
+    const cacheSalvo = localStorage.getItem(chaveCache)
+
+    if (cacheSalvo) {
+        // Se já tem no cache, usa ele e NÃO chama a API
+        setTexto(cacheSalvo)
         setCarregando(false)
-      })
-      .catch(err => {
-        console.error("Erro ao buscar palavra do dia", err)
-        setTexto("O Senhor é o meu pastor, nada me faltará.") // Fallback se der erro
-        setReferencia("Salmos 23:1")
-        setCarregando(false)
-      })
+    } else {
+        // Se não tem, busca na API
+        fetch(`https://bible-api.com/${refDoDia}?translation=almeida`)
+          .then(res => res.json())
+          .then(data => {
+            setTexto(data.text)
+            // Salva no cache para a próxima vez
+            localStorage.setItem(chaveCache, data.text)
+            setCarregando(false)
+          })
+          .catch(err => {
+            console.error("Erro", err)
+            setTexto("O Senhor é o meu pastor, nada me faltará.")
+            setCarregando(false)
+          })
+    }
   }, [])
 
-  // Função para compartilhar no WhatsApp
+  // ... (Restante do código: função compartilhar e return iguais) ...
   const compartilhar = () => {
     const mensagem = `*Palavra do Dia - CEMV* ✨\n\n"${texto.trim()}"\n_(${referencia})_`
     const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`
@@ -49,7 +61,6 @@ function PalavraDoDia() {
             <>
                 <p className="versiculo-texto">"{texto.trim()}"</p>
                 <p className="versiculo-ref">{referencia}</p>
-                
                 <button onClick={compartilhar} className="btn-share">
                     Compartilhar no WhatsApp 📲
                 </button>

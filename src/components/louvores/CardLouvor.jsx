@@ -1,7 +1,8 @@
+// src/components/louvores/CardLouvor.jsx
 import React from 'react'
 import './CardLouvor.css'
 
-function CardLouvor({ louvor, aoEditar, aoExcluir, aoVerLetra }) {
+function CardLouvor({ louvor, aoEditar, aoExcluir, aoVerLetra, adminMode }) {
   return (
     <div className="card">
       <div className="card-header">
@@ -15,14 +16,17 @@ function CardLouvor({ louvor, aoEditar, aoExcluir, aoVerLetra }) {
       
       {louvor.letra && (
         <button className="btn-link" onClick={() => aoVerLetra(louvor)}>
-            Ver Letra Completa
+            Ver Letra Completa 👁️
         </button>
       )}
 
-      <div className="card-actions">
-        <button className="btn-edit" onClick={() => aoEditar(louvor)}>Editar</button>
-        <button className="btn-delete" onClick={() => aoExcluir(louvor.id)}>Excluir</button>
-      </div>
+      {/* SÓ MOSTRA OS BOTÕES SE FOR ADMIN */}
+      {adminMode && (
+        <div className="card-actions">
+            <button className="btn-edit" onClick={() => aoEditar(louvor)}>Editar</button>
+            <button className="btn-delete" onClick={() => aoExcluir(louvor.id)}>Excluir</button>
+        </div>
+      )}
     </div>
   )
 }

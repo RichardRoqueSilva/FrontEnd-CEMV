@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import PlanoLeitura from '../components/biblia/PlanoLeitura'
 import LeitorBiblia from '../components/biblia/LeitorBiblia'
+import { useAuth } from '../context/AuthContext' // <--- Importar Contexto
 import '../App.css'
 
 function Biblia() {
+  const { user } = useAuth()
+  const usuarioLogado = !!user // True se tiver usuário, False se for visitante
+
   const [leituraAtiva, setLeituraAtiva] = useState({ livro: null, cap: null })
 
   const abrirNoLeitor = (livro, cap) => {
@@ -14,17 +18,21 @@ function Biblia() {
   return (
     <div className="main-content">
       
-      {/* Título Plano */}
       <h1 className="page-title">Plano de Leitura</h1>
       
-      <PlanoLeitura aoSelecionarCapitulo={abrirNoLeitor} />
+      {/* Passa a permissão para o componente */}
+      <PlanoLeitura 
+        aoSelecionarCapitulo={abrirNoLeitor} 
+        podeRegistrar={usuarioLogado} 
+      />
+      
+      <h1 className="page-title" style={{marginTop: '50px'}}>Bíblia Online</h1>
 
-      {/* Título Bíblia (Adicionei um margin-top para dar um respiro sem a linha) */}
-      <h1 className="page-title" style={{marginTop: '50px'}}>Bíblia Sagrada Online</h1>
-
+      {/* Passa a permissão para o componente */}
       <LeitorBiblia 
          livroInicial={leituraAtiva.livro} 
          capInicial={leituraAtiva.cap} 
+         podeAnotar={usuarioLogado}
       />
 
     </div>

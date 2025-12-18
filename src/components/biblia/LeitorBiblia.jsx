@@ -2,42 +2,43 @@ import { useState, useEffect, useRef } from 'react'
 import { LISTA_LIVROS } from '../../utils/dadosBiblia'
 import './LeitorBiblia.css'
 
-function LeitorBiblia({ livroInicial, capInicial }) {
+function LeitorBiblia({ livroInicial, capInicial, podeAnotar }) {
   const [livroSelecionado, setLivroSelecionado] = useState(LISTA_LIVROS[0])
   const [capituloSelecionado, setCapituloSelecionado] = useState(1)
   const [versiculos, setVersiculos] = useState([])
+  
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState(null)
   
-  // --- CONTROLE DE LEITURA DE VOZ (ÁUDIO) ---
+  // --- CONTROLE DE ÁUDIO (TEXT-TO-SPEECH) ---
   const [lendo, setLendo] = useState(false)
   const [velocidade, setVelocidade] = useState(1)
   const [vozesDisponiveis, setVozesDisponiveis] = useState([])
   const [vozSelecionada, setVozSelecionada] = useState(null)
-  
   const synth = window.speechSynthesis
 
-  // --- CONTROLE DE ESTUDO (NOTAS E CORES) ---
+  // --- CONTROLE DE ESTUDO (NOTAS) ---
   const [notasUsuario, setNotasUsuario] = useState({})
   const [versoEmEdicao, setVersoEmEdicao] = useState(null)
   const [tempNota, setTempNota] = useState("")
   const [tempCor, setTempCor] = useState("")
 
-  // 1. Carregar notas salvas do LocalStorage
+  // 1. Carregar notas
   useEffect(() => {
     const salvas = localStorage.getItem('cemv_biblia_notas')
     if (salvas) setNotasUsuario(JSON.parse(salvas))
   }, [])
 
-  // 2. Carregar e filtrar vozes em Português
+  // 2. Carregar vozes
   useEffect(() => {
     const carregarVozes = () => {
       const todasVozes = synth.getVoices()
       const vozesPT = todasVozes.filter(v => v.lang.includes('pt'))
       setVozesDisponiveis(vozesPT)
-      // Tenta selecionar uma padrão
-      if (vozesPT.length > 0) {
-        setVozSelecionada(vozesPT[0])
+      // Tenta priorizar Google ou a primeira
+      const vozGoogle = vozesPT.find(v => v.name.includes('Google'))
+      if (!vozSelecionada && vozesPT.length > 0) {
+        setVozSelecionada(vozGoogle || vozesPT[0])
       }
     }
     carregarVozes()
@@ -46,7 +47,7 @@ function LeitorBiblia({ livroInicial, capInicial }) {
     }
   }, [])
 
-  // 3. Sincroniza props
+  // 3. Sincronizar Props (Vindas do Plano de Leitura)
   useEffect(() => {
     if (livroInicial && capInicial) {
         const livroObj = LISTA_LIVROS.find(l => l.nome === livroInicial)
@@ -57,18 +58,42 @@ function LeitorBiblia({ livroInicial, capInicial }) {
     }
   }, [livroInicial, capInicial])
 
-  // 4. Busca Texto e Para a leitura anterior
+  // 4. Buscar Texto (COM OTIMIZAÇÃO DE CACHE)
   useEffect(() => {
     cancelarLeitura()
     buscarVersiculos()
   }, [livroSelecionado, capituloSelecionado])
 
   const buscarVersiculos = () => {
-    setCarregando(true); setErro(null)
-    fetch(`https://bible-api.com/${livroSelecionado.nome}+${capituloSelecionado}?translation=almeida`)
-      .then(res => res.json())
-      .then(data => { setVersiculos(data.verses); setCarregando(false) })
-      .catch(() => { setErro("Erro ao carregar texto sagrado."); setCarregando(false) })
+    setCarregando(true)
+    setErro(null)
+
+    // --- LÓGICA DE CACHE PARA ACELERAR ---
+    const chaveCache = `biblia_${livroSelecionado.nome}_${capituloSelecionado}`
+    const cacheSalvo = sessionStorage.getItem(chaveCache)
+
+    if (cacheSalvo) {
+        // Se já tem na memória, usa direto (Instantâneo)
+        setVersiculos(JSON.parse(cacheSalvo))
+        setCarregando(false)
+    } else {
+        // Se não tem, vai na internet
+        fetch(`https://bible-api.com/${livroSelecionado.nome}+${capituloSelecionado}?translation=almeida`)
+          .then(res => {
+            if(!res.ok) throw new Error("Erro na API")
+            return res.json()
+          })
+          .then(data => { 
+             setVersiculos(data.verses)
+             setCarregando(false)
+             // Salva no cache para a próxima vez
+             sessionStorage.setItem(chaveCache, JSON.stringify(data.verses))
+          })
+          .catch(() => { 
+             setErro("Erro ao carregar texto.")
+             setCarregando(false) 
+          })
+    }
   }
 
   const handleTrocaLivro = (e) => {
@@ -77,10 +102,13 @@ function LeitorBiblia({ livroInicial, capInicial }) {
     setCapituloSelecionado(1)
   }
 
-  // --- LÓGICA DE ESTUDO (NOTAS) ---
+  // --- LÓGICA DE NOTAS ---
   const abrirEditor = (numVerso) => {
+    if (!podeAnotar) return 
+
     const chave = `${livroSelecionado.nome}-${capituloSelecionado}-${numVerso}`
     const dadosExistentes = notasUsuario[chave] || { cor: '', nota: '' }
+    
     setVersoEmEdicao(numVerso)
     setTempCor(dadosExistentes.cor)
     setTempNota(dadosExistentes.nota)
@@ -106,8 +134,7 @@ function LeitorBiblia({ livroInicial, capInicial }) {
     return notasUsuario[chave] || { cor: '', nota: '' }
   }
 
-  // --- LÓGICA DE LEITURA (ÁUDIO) ---
-  
+  // --- LÓGICA DE ÁUDIO ---
   const iniciarLeitura = (velocidadeEscolhida) => {
     if (versiculos.length === 0) return
     if (synth.speaking) synth.cancel()
@@ -157,30 +184,21 @@ function LeitorBiblia({ livroInicial, capInicial }) {
 
     if (lendo) {
         cancelarLeitura()
-        setTimeout(() => {
-            if (versiculos.length === 0) return
-            const textoCompleto = `${livroSelecionado.nome}, capítulo ${capituloSelecionado}. ` + 
-                                  versiculos.map(v => v.text).join(" ")
-            const utterThis = new SpeechSynthesisUtterance(textoCompleto)
-            utterThis.voice = novaVoz
-            utterThis.rate = velocidade
-            utterThis.onend = () => setLendo(false)
-            setLendo(true)
-            synth.speak(utterThis)
-        }, 100)
+        setTimeout(() => iniciarLeitura(velocidade), 100)
     }
   }
 
   const getIconeVoz = (nome) => {
     const n = nome.toLowerCase()
-    if (n.includes('daniel') || n.includes('felipe') || n.includes('male')) return '👨'
-    if (n.includes('maria') || n.includes('luciana') || n.includes('female') || n.includes('google')) return '👩'
+    if (n.includes('daniel') || n.includes('male')) return '👨'
+    if (n.includes('maria') || n.includes('female')) return '👩'
     return '🗣️'
   }
 
   return (
     <div className="leitor-container">
       
+      {/* SELETORES DE NAVEGAÇÃO */}
       <div className="biblia-controls form-box-row">
         <div style={{flex: 1}}>
             <label>Livro:</label>
@@ -202,20 +220,16 @@ function LeitorBiblia({ livroInicial, capInicial }) {
 
       <div className="biblia-leitura-box">
         
-        {/* BARRA DE CONTROLE DE ÁUDIO */}
+        {/* BARRA DE ÁUDIO */}
         <div className="audio-controls-bar">
-            <h2 className="titulo-capitulo-audio">
-                {livroSelecionado.nome} {capituloSelecionado}
-            </h2>
+            <h2 className="titulo-capitulo-audio">{livroSelecionado.nome} {capituloSelecionado}</h2>
             
             <div className="player-actions">
-                {/* Seletor de Voz */}
                 {vozesDisponiveis.length > 0 && (
                     <select 
                         className="select-velocidade"
                         value={vozSelecionada ? vozSelecionada.name : ''} 
                         onChange={mudarVoz}
-                        title="Escolha a Voz"
                         style={{maxWidth: '150px'}}
                     >
                         {vozesDisponiveis.map((v) => (
@@ -226,13 +240,7 @@ function LeitorBiblia({ livroInicial, capInicial }) {
                     </select>
                 )}
 
-                {/* Seletor de Velocidade */}
-                <select 
-                    className="select-velocidade"
-                    value={velocidade}
-                    onChange={mudarVelocidade}
-                    title="Velocidade"
-                >
+                <select className="select-velocidade" value={velocidade} onChange={mudarVelocidade}>
                     <option value="0.75">0.75x</option>
                     <option value="1">1.0x</option>
                     <option value="1.25">1.25x</option>
@@ -240,33 +248,28 @@ function LeitorBiblia({ livroInicial, capInicial }) {
                     <option value="2">2.0x</option>
                 </select>
 
-                <button 
-                    onClick={alternarLeitura} 
-                    className={lendo ? "btn-stop" : "btn-play"}
-                >
-                    {lendo ? "⏹️" : "🔊"}
+                <button onClick={alternarLeitura} className={lendo ? "btn-stop" : "btn-play"}>
+                    {lendo ? "⏹️ Parar" : "🔊 Ouvir"}
                 </button>
             </div>
         </div>
 
         <hr style={{margin: '0 0 20px 0', border: 0, borderTop: '1px solid #eee'}}/>
 
-        {/* LISTA DE VERSÍCULOS (Com suporte a clique e cor) */}
-        {carregando ? <div className="loading">Carregando palavra...</div> : erro ? <div style={{color:'red'}}>{erro}</div> : (
+        {/* TEXTO BÍBLICO */}
+        {carregando ? <div className="loading">Carregando palavra...</div> : erro ? <div style={{color:'red', textAlign:'center'}}>{erro}</div> : (
             <div className="versiculos-lista">
                 {versiculos.map((v) => {
-                    // Pega dados de cor/nota se existirem
                     const dados = getDadosVerso(v.verse)
                     return (
                         <div 
                             key={v.verse} 
                             className={`versiculo ${dados.cor ? `bg-${dados.cor}` : ''}`} 
                             onClick={() => abrirEditor(v.verse)}
-                            title="Clique para grifar ou comentar"
+                            title={podeAnotar ? "Clique para editar" : "Faça login para anotar"}
+                            style={{cursor: podeAnotar ? 'pointer' : 'default'}}
                         >
                             <span className="v-numero">{v.verse}</span> {v.text}
-                            
-                            {/* Mostra nota se existir */}
                             {dados.nota && <span className="nota-usuario">📝 {dados.nota}</span>}
                         </div>
                     )
@@ -275,7 +278,7 @@ function LeitorBiblia({ livroInicial, capInicial }) {
         )}
       </div>
 
-      {/* --- MODAL DE EDIÇÃO DE VERSÍCULO --- */}
+      {/* MODAL (DENTRO DA DIV PRINCIPAL) */}
       {versoEmEdicao && (
         <div className="editor-overlay" onClick={() => setVersoEmEdicao(null)}>
             <div className="editor-box" onClick={e => e.stopPropagation()}>
@@ -292,10 +295,8 @@ function LeitorBiblia({ livroInicial, capInicial }) {
 
                 <p style={{fontSize:'0.9rem', marginBottom:'10px', color:'#555'}}>Anotação:</p>
                 <textarea 
-                    className="input-nota" 
-                    rows="3" 
-                    placeholder="Escreva sua anotação..."
-                    value={tempNota}
+                    className="input-nota" rows="3" 
+                    placeholder="Sua reflexão..." value={tempNota} 
                     onChange={(e) => setTempNota(e.target.value)}
                 ></textarea>
 
