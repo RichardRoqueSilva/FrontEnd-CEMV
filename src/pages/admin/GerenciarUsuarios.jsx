@@ -22,8 +22,18 @@ function GerenciarUsuarios() {
   const carregarUsuarios = () => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
     setLoading(true)
-    fetch(`${apiUrl}/api/usuarios`)
-      .then(res => res.json())
+    
+    fetch(`${apiUrl}/api/usuarios`, {
+        method: 'GET',
+        headers: {
+            // --- ENVIO DO TOKEN JWT ---
+            'Authorization': `Bearer ${user.token}`
+        }
+    })
+      .then(res => {
+          if (res.status === 403) throw new Error("Sem permissão.")
+          return res.json()
+      })
       .then(data => {
           // Ordena: Pastor primeiro, depois Admin, depois Membro
           const ordem = { 'PASTOR': 1, 'ADMIN': 2, 'MEMBER': 3 }
@@ -33,6 +43,7 @@ function GerenciarUsuarios() {
       })
       .catch(err => {
           console.error(err)
+          alert("Erro ao carregar lista de usuários.")
           setLoading(false)
       })
   }
@@ -43,11 +54,21 @@ function GerenciarUsuarios() {
         
         fetch(`${apiUrl}/api/usuarios/${id}/role`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: novoCargo // Envia string pura
+            headers: {
+                'Content-Type': 'application/json',
+                // --- ENVIO DO TOKEN JWT ---
+                'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify(novoCargo) // Envia a string (ex: "ADMIN")
         })
-        .then(() => carregarUsuarios())
-        .catch(err => alert("Erro ao alterar."))
+        .then(res => {
+            if (res.ok) {
+                carregarUsuarios() // Recarrega a lista para atualizar a tela
+            } else {
+                alert("Erro ao alterar cargo.")
+            }
+        })
+        .catch(err => alert("Erro de conexão."))
     }
   }
 
@@ -56,7 +77,7 @@ function GerenciarUsuarios() {
       <h1 className="page-title">Gestão Pastoral</h1>
       
       {loading ? (
-          <p style={{textAlign:'center'}}>Carregando...</p>
+          <p style={{textAlign:'center'}}>Carregando equipe...</p>
       ) : (
           <div className="gestao-container">
             <div className="users-grid">
@@ -79,11 +100,12 @@ function GerenciarUsuarios() {
                         </div>
                         
                         <div className="user-actions">
+                            {/* Não permite alterar o próprio cargo para evitar trancar a si mesmo fora */}
                             {u.email === user?.email ? (
-                                <span className="user-self">Você (Pastor Logado)</span>
+                                <span className="user-self">Você (Logado)</span>
                             ) : (
                                 <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
-                                    <label style={{fontSize:'0.8rem', fontWeight:'bold'}}>Alterar Cargo:</label>
+                                    <label style={{fontSize:'0.8rem', fontWeight:'bold', color:'#555'}}>Alterar Cargo:</label>
                                     <select 
                                         value={u.role} 
                                         onChange={(e) => mudarCargo(u.id, e.target.value, u.nome)}

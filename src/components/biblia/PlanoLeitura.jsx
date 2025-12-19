@@ -4,7 +4,6 @@ import './PlanoLeitura.css'
 
 function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
   
-  // Função auxiliar para pegar a data de HOJE no formato YYYY-MM-DD local
   const pegarDataHojeLocal = () => {
     const hoje = new Date()
     const offset = hoje.getTimezoneOffset()
@@ -12,7 +11,6 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
     return dataLocal.toISOString().split('T')[0]
   }
 
-  // Estado de Configuração (Persistido no LocalStorage)
   const [config, setConfig] = useState(() => {
     const salvo = localStorage.getItem('cemv_plano')
     return salvo ? JSON.parse(salvo) : {
@@ -26,41 +24,45 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
   const [planoAberto, setPlanoAberto] = useState(false)
   const [dataConsulta, setDataConsulta] = useState(pegarDataHojeLocal())
 
-  // Salva no storage sempre que mudar
   useEffect(() => {
     localStorage.setItem('cemv_plano', JSON.stringify(config))
   }, [config])
 
-  // Lógica do Plano
   const listaAtual = config.tipoOrdem === 'CRONOLOGICA' ? BIBLIA_CRONOLOGICA : BIBLIA_COMPLETA
   const capsPorDia = Math.ceil(1189 / config.diasPlano)
   const porcentagem = Math.min(100, Math.floor((config.capitulosLidos / 1189) * 100))
 
-  // Lógica do Calendário (Dias Corridos)
-  const calcularMetaDoDia = (data) => {
+  const indiceDiaAtual = Math.floor(config.capitulosLidos / capsPorDia)
+  const inicioBatch = indiceDiaAtual * capsPorDia
+  const fimBatch = inicioBatch + capsPorDia
+  const capitulosDoDia = listaAtual.slice(inicioBatch, fimBatch)
+
+  const calcularMetaDoDiaCalendario = (data) => {
     const inicioParts = config.dataInicio.split('-')
     const dataInicio = new Date(inicioParts[0], inicioParts[1] - 1, inicioParts[2])
-
     const atualParts = data.split('-')
     const dataAtual = new Date(atualParts[0], atualParts[1] - 1, atualParts[2])
-    
-    const diffTempo = dataAtual - dataInicio
-    const diffDias = Math.floor(diffTempo / (1000 * 60 * 60 * 24))
+    const diffDias = Math.floor((dataAtual - dataInicio) / (1000 * 60 * 60 * 24))
     
     if (diffDias < 0) return []
-
-    const indiceInicial = diffDias * capsPorDia
-    return listaAtual.slice(indiceInicial, indiceInicial + capsPorDia)
+    const idx = diffDias * capsPorDia
+    return listaAtual.slice(idx, idx + capsPorDia)
   }
+  const metaCalendario = calcularMetaDoDiaCalendario(dataConsulta)
 
-  const metaCalendario = calcularMetaDoDia(dataConsulta)
+  const toggleCapitulo = (indexNoBatch) => {
+    if (!podeRegistrar) return alert("Faça login para marcar a leitura.")
 
-  const marcarComoLido = () => {
-    if (config.capitulosLidos >= 1189) return alert("Parabéns! Bíblia Concluída!")
-    setConfig(prev => ({
-      ...prev,
-      capitulosLidos: Math.min(1189, prev.capitulosLidos + capsPorDia)
-    }))
+    const indiceReal = inicioBatch + indexNoBatch
+
+    if (indiceReal === config.capitulosLidos) {
+        setConfig(prev => ({ ...prev, capitulosLidos: prev.capitulosLidos + 1 }))
+    } else if (indiceReal === config.capitulosLidos - 1) {
+        setConfig(prev => ({ ...prev, capitulosLidos: prev.capitulosLidos - 1 }))
+    } else {
+        // Se clicar fora de ordem, apenas avisa ou ignora
+        // alert("Por favor, marque os capítulos na ordem.")
+    }
   }
 
   const reiniciarPlano = () => {
@@ -89,7 +91,7 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
 
       {planoAberto && (
         <div className="plano-conteudo-animado">
-            {/* Configuração do Plano */}
+            {/* Configuração */}
             <div className="plano-config">
                 <div>
                     <label>Ordem:</label>
@@ -109,12 +111,11 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
                         onChange={(e) => setConfig({...config, diasPlano: Number(e.target.value)})}
                         className="select-plano"
                     >
-                        <option value={365}>1 Ano (Anual)</option>
+                        <option value={365}>1 Ano</option>
                         <option value={180}>6 Meses</option>
                         <option value={90}>3 Meses</option>
                     </select>
                 </div>
-                
                 <div>
                     <label>Início:</label>
                     <input 
@@ -126,18 +127,65 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
                 </div>
             </div>
 
-            {/* Barra de Progresso */}
             <div className="barra-progresso-container">
                 <div className="barra-progresso-fill" style={{width: `${porcentagem}%`}}></div>
                 <span className="barra-texto">{porcentagem}% Concluído ({config.capitulosLidos}/1189)</span>
             </div>
 
+            {/* --- ÁREA DE LEITURA ATUAL (BOTÕES DUPLOS) --- */}
+            <div className="meta-leitura atual">
+                {config.capitulosLidos >= 1189 ? (
+                    <div className="concluido-msg">
+                        <h3>🏆 PARABÉNS!</h3>
+                        <p>Bíblia Concluída!</p>
+                        <button className="btn-edit" onClick={() => setConfig({...config, capitulosLidos: 0})}>Reiniciar</button>
+                    </div>
+                ) : (
+                    <>
+                        <p className="meta-titulo">
+                            Sua Meta de Hoje (Dia {indiceDiaAtual + 1}):
+                        </p>
+                        <div className="meta-lista">
+                            {capitulosDoDia.map((item, index) => {
+                                const estaLido = (inicioBatch + index) < config.capitulosLidos
+                                
+                                return (
+                                    <div key={index} className={`chip-split ${estaLido ? 'lido' : ''}`}>
+                                        
+                                        {/* LADO ESQUERDO: Checkbox (Marca/Desmarca) */}
+                                        <div 
+                                            className="chip-part-check"
+                                            onClick={() => toggleCapitulo(index)}
+                                            title={estaLido ? "Desmarcar" : "Marcar como concluído"}
+                                        >
+                                            {estaLido ? '✅' : '⬜'}
+                                        </div>
+
+                                        {/* LADO DIREITO: Texto (Abre o Leitor) */}
+                                        <div 
+                                            className="chip-part-text"
+                                            onClick={() => aoSelecionarCapitulo(item.livro, item.cap)}
+                                            title="Ler este capítulo agora"
+                                        >
+                                            {item.livro} {item.cap}
+                                        </div>
+
+                                    </div>
+                                )
+                            })}
+                        </div>
+                        <p style={{fontSize:'0.8rem', color:'#888', marginTop:'10px'}}>
+                            * Clique no <b>quadrado</b> para marcar e no <b>nome</b> para ler.
+                        </p>
+                    </>
+                )}
+            </div>
+
             {/* Calendário de Consulta */}
             <div className="calendario-area">
                 <hr className="divisor-leve"/>
-                
-                <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:'10px', marginBottom:'15px'}}>
-                    <label style={{marginBottom:0}}>Ver leitura do dia:</label>
+                <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:'10px', marginBottom:'10px'}}>
+                    <label style={{marginBottom:0, fontSize:'0.9rem'}}>Consultar datas:</label>
                     <input 
                         type="date" 
                         value={dataConsulta} 
@@ -146,55 +194,12 @@ function PlanoLeitura({ aoSelecionarCapitulo, podeRegistrar }) {
                     />
                 </div>
                 
-                <div className="meta-leitura">
-                    {metaCalendario.length > 0 ? (
-                        <>
-                            <p className="meta-titulo">
-                                Leitura para {new Date(dataConsulta.split('-')).toLocaleDateString('pt-BR')} <br/>
-                                <small style={{fontWeight:'normal', fontSize:'0.9rem'}}>
-                                    (Ordem {config.tipoOrdem === 'CRONOLOGICA' ? 'Cronológica' : 'Bíblica'})
-                                </small>
-                            </p>
-                            
-                            <div className="meta-lista">
-                                {metaCalendario.map((item, index) => (
-                                    <button 
-                                        key={index} 
-                                        className="chip-capitulo"
-                                        onClick={() => aoSelecionarCapitulo(item.livro, item.cap)}
-                                    >
-                                        {item.livro} {item.cap}
-                                    </button>
-                                ))}
-                            </div>
-                        </>
-                    ) : (
-                        <p style={{color: '#999'}}>
-                            Esta data é anterior ao início do seu plano ({new Date(config.dataInicio.split('-')).toLocaleDateString('pt-BR')}).
-                        </p>
-                    )}
-
-                    {/* BOTÃO CONDICIONAL DE PERMISSÃO */}
-                    {podeRegistrar ? (
-                        <button className="btn-save" onClick={marcarComoLido}>
-                            ✅ Marcar Leitura de Hoje como Lida
-                        </button>
-                    ) : (
-                        <div style={{marginTop: '20px', padding: '10px', backgroundColor: '#f9f9f9', borderTop: '1px solid #eee'}}>
-                            <p style={{color: '#777', fontStyle: 'italic', marginBottom: '5px'}}>
-                                🔒 Faça login para salvar seu progresso.
-                            </p>
-                            <a href="/login" className="btn-link" style={{fontSize: '1rem'}}>
-                                Ir para Login
-                            </a>
-                        </div>
-                    )}
-                    
-                    {podeRegistrar && config.capitulosLidos > 0 && (
-                         <button className="btn-link" style={{fontSize: '0.8rem', marginTop:'10px', alignSelf:'center'}} onClick={reiniciarPlano}>
-                            Reiniciar Plano
-                         </button>
-                    )}
+                <div className="meta-lista pequena">
+                    {metaCalendario.map((item, index) => (
+                        <span key={index} className="chip-simples">
+                            {item.livro} {item.cap}
+                        </span>
+                    ))}
                 </div>
             </div>
         </div>

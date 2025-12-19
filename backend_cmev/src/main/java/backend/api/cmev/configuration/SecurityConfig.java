@@ -1,5 +1,5 @@
 package backend.api.cmev.configuration;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,35 +11,64 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    SecurityFilter securityFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <--- ATIVA O CORS
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // ... (Swagger, Auth, Contatos e Leitura - PermitAll) ...
+                        // PÚBLICO
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/contatos").permitAll()
 
-                        // LOUVORES E CULTOS (Escrita): Pastor OU Admin
-                        // Nota: O Spring Security usa hasRole, mas como não estamos usando filtros complexos
-                        // vamos manter permitAll() e confiar na lógica do Controller ou Frontend por enquanto
-                        // para não complicar com Tokens JWT agora.
-                        .requestMatchers("/api/louvores/**").permitAll()
-                        .requestMatchers("/api/cultos/**").permitAll()
+                        // LEITURA PÚBLICA
+                        .requestMatchers(HttpMethod.GET, "/api/louvores").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cultos").permitAll()
 
-                        // USUÁRIOS (Apenas PASTOR) - Aqui podemos fechar!
-                        // Mas como seu login é via JSON simples sem Token no Header,
-                        // se colocarmos hasRole("PASTOR") vai bloquear tudo.
-                        // Mantenha permitAll() aqui e confie na proteção do Frontend + verificação no Controller abaixo.
-                        .requestMatchers("/api/usuarios/**").permitAll()
+                        // EDIÇÃO (STAFF)
+                        .requestMatchers(HttpMethod.POST, "/api/louvores").hasAnyRole("ADMIN", "PASTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/louvores/**").hasAnyRole("ADMIN", "PASTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/louvores/**").hasAnyRole("ADMIN", "PASTOR")
 
-                        .anyRequest().permitAll()
+                        // GESTÃO (PASTOR)
+                        .requestMatchers("/api/usuarios/**").hasRole("PASTOR")
+
+                        .anyRequest().authenticated()
                 )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+    }
+
+    // --- CONFIGURAÇÃO DO CORS ---
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Libera acesso para qualquer origem (pode trocar "*" por "http://localhost:5173" se quiser ser estrito)
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

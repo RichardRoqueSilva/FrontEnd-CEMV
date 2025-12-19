@@ -6,16 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import backend.api.cmev.services.TokenService;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // Importante para o React acessar
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
     private UsuarioRepository repository;
 
-    // LOGIN AUTOMÁTICO
+    @Autowired
+    private TokenService tokenService; // Injetar
+
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody Usuario dadosLogin) {
         Usuario user = repository.findByEmail(dadosLogin.getEmail());
@@ -24,12 +28,20 @@ public class AuthController {
             return ResponseEntity.status(401).body("Usuário não encontrado");
         }
 
-        // Verifica se a senha bate com a criptografia
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (encoder.matches(dadosLogin.getSenha(), user.getSenha())) {
-            // Retorna o usuário (O ideal seria um DTO sem a senha, mas para simplificar vamos assim)
-            // Importante: No front vamos usar user.role e user.nome
-            return ResponseEntity.ok(user);
+
+            // GERA O TOKEN
+            String token = tokenService.generateToken(user);
+
+            // Retorna Token + Dados do Usuário
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "nome", user.getNome(),
+                    "role", user.getRole(),
+                    "email", user.getEmail()
+            ));
+
         } else {
             return ResponseEntity.status(401).body("Senha incorreta");
         }

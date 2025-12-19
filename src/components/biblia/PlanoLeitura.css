@@ -1,20 +1,24 @@
-/* Container Principal */
+/* =========================================
+   ESTILOS DO PLANO DE LEITURA
+   ========================================= */
+
+/* --- CONTAINER PRINCIPAL (Acordeão) --- */
 .plano-container {
   margin-bottom: 40px;
-  border-left: 5px solid #f1c40f !important;
+  border-left: 5px solid #f1c40f !important; /* Dourado da Identidade */
   background: white;
-  border-radius: 8px; /* Arredondar cantos */
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: all 0.3s;
 }
 
-/* Cabeçalho */
+/* Cabeçalho Clicável */
 .plano-header {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px; /* Mais espaçamento interno */
+  padding: 15px 20px;
   user-select: none;
 }
 
@@ -27,8 +31,9 @@
   width: 100%;
 }
 
-.plano-header h2 { color: #2b0505; margin: 0; }
+.plano-header h2 { color: #2b0505; margin: 0; font-size: 1.2rem; }
 
+/* Seta Animada */
 .seta-plano {
   font-size: 1.2rem;
   color: #2b0505;
@@ -37,7 +42,7 @@
 }
 .seta-plano.aberta { transform: rotate(180deg); }
 
-/* Conteúdo que abre */
+/* Conteúdo Expansível (Animação) */
 .plano-conteudo-animado {
   animation: slideDown 0.4s ease-out;
   padding: 20px;
@@ -49,12 +54,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Configuração (Selects e Datas) */
+/* --- ÁREA DE CONFIGURAÇÃO (Selects e Datas) --- */
 .plano-config {
   display: flex;
   gap: 20px;
   margin-bottom: 25px;
-  justify-content: center; /* CENTRALIZA O CONTEÚDO */
+  justify-content: center; /* Centralizado */
   flex-wrap: wrap;
   align-items: flex-end;
 }
@@ -78,13 +83,14 @@
   font-weight: bold;
   color: #2b0505;
   outline: none;
+  background-color: white;
 }
 .select-plano:focus, .input-data:focus { border-color: #a82626; }
 
-/* Barra de Progresso */
+/* --- BARRA DE PROGRESSO --- */
 .barra-progresso-container {
   width: 100%;
-  height: 30px; /* Um pouco mais alta */
+  height: 30px;
   background-color: #e0e0e0;
   border-radius: 15px;
   overflow: hidden;
@@ -111,74 +117,173 @@
   white-space: nowrap;
 }
 
-/* Calendário e Meta */
-.calendario-area {
-  text-align: center; /* CENTRALIZA TUDO DENTRO */
-}
-
-.input-data.destaque {
-  border-color: #a82626;
-  background-color: #fff5f5;
-  text-align: center;
-  margin-left: 10px;
-}
-
-.meta-leitura {
-  background-color: #fff9f9;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px dashed #a82626;
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Garante que os botões fiquem no meio */
-}
-.meta-leitura .btn-save {
-    align-self: center !important; 
-    width: auto;
-    min-width: 250px; /* Um tamanho mínimo para ficar bonito */
-    margin-top: 20px;
+/* --- META DE LEITURA ATUAL --- */
+.meta-leitura.atual {
+    background-color: #fffdf0; /* Fundo levemente dourado */
+    border: 2px solid #f1c40f;
+    padding: 25px;
+    border-radius: 8px;
+    text-align: center;
 }
 
 .meta-titulo {
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #555;
-  font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2b0505;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .meta-lista {
-  display: flex;
-  justify-content: center; /* IMPORTANTE: Centraliza os botões */
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-  width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
 }
 
-.chip-capitulo {
-  background-color: white;
-  border: 1px solid #2b0505;
-  color: #2b0505;
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: 0.2s;
-  font-weight: 500;
+/* --- BOTÃO DUPLO (SPLIT BUTTON) - NOVO --- */
+.chip-split {
+    display: flex;
+    background-color: white;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden; /* Garante que os filhos não vazem a borda arredondada */
+    transition: all 0.3s;
+    min-width: 140px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-.chip-capitulo:hover { background-color: #2b0505; color: white; }
+
+.chip-split:hover {
+    border-color: #f1c40f;
+    transform: translateY(-2px);
+}
+
+/* Parte Esquerda: Checkbox (Marca/Desmarca) */
+.chip-part-check {
+    padding: 10px 12px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border-right: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+.chip-part-check:hover {
+    background-color: #e6e6e6;
+}
+
+/* Parte Direita: Texto (Abre Leitor) */
+.chip-part-text {
+    padding: 10px 15px;
+    cursor: pointer;
+    flex-grow: 1; /* Ocupa o resto do espaço */
+    font-weight: bold;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.chip-part-text:hover {
+    background-color: #fff8e1; /* Amarelinho ao passar no texto */
+    color: #2b0505;
+}
+
+/* ESTADO LIDO (Verde) */
+.chip-split.lido {
+    border-color: #27ae60;
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+}
+
+.chip-split.lido .chip-part-check {
+    background-color: #27ae60;
+    color: white; /* O check fica branco no fundo verde */
+    border-right-color: #219150;
+}
+
+.chip-split.lido .chip-part-text {
+    background-color: #e8f8f0; /* Fundo verde bem claro no texto */
+    color: #1e8449; /* Texto verde escuro */
+}
+
+/* --- OUTROS ELEMENTOS --- */
+
+/* Mensagem de Parabéns */
+.concluido-msg {
+    color: #27ae60;
+}
+
+/* Botões Genéricos (Reiniciar) */
+.btn-edit { 
+    background-color: #f39c12; 
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    margin-top: 10px; 
+}
+
+/* --- ÁREA DE CONSULTA (CALENDÁRIO) --- */
+.calendario-area {
+    text-align: center;
+    margin-top: 30px;
+    opacity: 0.9;
+}
 
 .divisor-leve {
     border: 0; 
     height: 1px; 
     background: #eee; 
-    margin: 25px 0;
+    margin: 20px 0;
 }
 
-.btn-save {
-    width: auto;
-    padding: 10px 30px;
-    font-size: 1rem;
+.input-data.destaque {
+    border-color: #a82626;
+    background-color: #fff5f5;
+    text-align: center;
+}
+
+/* Estilo para os itens do calendário (não clicáveis como checkbox) */
+.meta-lista.pequena {
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.chip-simples {
+    background-color: #eee;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 600px) {
+    .plano-config {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .plano-config div {
+        width: 100%;
+    }
+    
+    .select-plano, .input-data {
+        width: 100%;
+    }
+
+    /* No celular, os botões ocupam a largura toda */
+    .chip-split {
+        width: 100%;
+    }
+    
+    .chip-part-text {
+        justify-content: flex-start; /* Alinha texto a esquerda no mobile */
+    }
 }

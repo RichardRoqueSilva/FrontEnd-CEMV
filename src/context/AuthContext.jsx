@@ -1,18 +1,27 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { preCarregarLeituraDiaria } from '../utils/bibliaPreloader'; // <--- IMPORTANTE
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // null = Visitante
 
   useEffect(() => {
+    // Ao abrir o site, verifica se tem usuário salvo
     const savedUser = localStorage.getItem('cemv_user');
+    
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+
+      // --- PERFORMANCE: PRÉ-CARREGAMENTO ---
+      // Se o usuário já está logado, esperamos 1 segundo (para o site renderizar)
+      // e então começamos a baixar os capítulos da Bíblia de hoje em background.
+      setTimeout(() => {
+          preCarregarLeituraDiaria();
+      }, 1000);
     }
   }, []);
 
-  // LOGIN REAL
   const login = async (email, senha) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
@@ -23,12 +32,14 @@ export function AuthProvider({ children }) {
       });
 
       if (response.ok) {
-        const userData = await response.json(); // Recebe { nome, role, email... } do Java
-        setUser(userData);
-        localStorage.setItem('cemv_user', JSON.stringify(userData));
-        return true; // Sucesso
+        const data = await response.json(); 
+        // data agora contém: { token, nome, role, email }
+        
+        setUser(data);
+        localStorage.setItem('cemv_user', JSON.stringify(data));
+        return true;
       } else {
-        return false; // Falha
+        return false;
       }
     } catch (error) {
       console.error("Erro no login:", error);
@@ -37,7 +48,6 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    // Confirmação antes de sair
     if (window.confirm("Tem certeza que deseja sair da sua conta?")) {
         setUser(null);
         localStorage.removeItem('cemv_user');

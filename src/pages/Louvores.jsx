@@ -44,7 +44,10 @@ function Louvores() {
 
     fetch(url, {
       method: metodo,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}` // <--- O PULO DO GATO
+      },
       body: JSON.stringify(form)
     })
     .then(res => { if(res.ok) return res.json(); throw new Error() })
