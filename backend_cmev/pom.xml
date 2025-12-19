@@ -97,6 +97,21 @@
             <artifactId>java-jwt</artifactId>
             <version>4.4.0</version>
         </dependency>
+
+        <!-- 1. Banco H2 (Banco em memória so para testes) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- 2. Ferramentas de Teste do Spring (JUnit, Mockito, etc) -->
+        <!-- Geralmente ja vem no projeto, mas confira se esta la -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
