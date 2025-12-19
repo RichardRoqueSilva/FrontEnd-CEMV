@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class ContatoConsumer {
 
     // E-mail que receberá as notificações
-    private static final String EMAIL_DESTINO = "richard100@gmail.com";
+    private static final String EMAIL_DESTINO = "igrejacemv@outlook.com";
 
     @Autowired
     private JavaMailSender mailSender;
@@ -87,3 +87,4 @@ public class ContatoConsumer {
         }
     }
 }
+
