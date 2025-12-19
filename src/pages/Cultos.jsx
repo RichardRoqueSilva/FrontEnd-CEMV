@@ -1,50 +1,109 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Carrossel from '../components/cultos/Carrossel'
-
-// --- 1. Importando Imagens de PREGAÇÃO ---
-import pregacao1 from '../assets/img/pregacao/foto1.jpeg'
-import pregacao2 from '../assets/img/pregacao/foto2.jpeg'
-import pregacao3 from '../assets/img/pregacao/foto3.jpeg'
-import pregacao4 from '../assets/img/pregacao/foto4.jpeg'
-
-// --- 2. Importando Imagens de LOUVOR ---
-// Certifique-se de que os arquivos existem nessa pasta!
-import louvor1 from '../assets/img/louvor/louvor1.jpeg'
-import louvor2 from '../assets/img/louvor/louvor2.jpeg'
-import louvor3 from '../assets/img/louvor/louvor3.jpeg'
-import louvor4 from '../assets/img/louvor/louvor4.jpeg'
-import louvor5 from '../assets/img/louvor/louvor5.jpeg'
-
-// Organizando os arrays
-const imagensPregacao = [pregacao1, pregacao2, pregacao3, pregacao4]
-const imagensLouvor = [louvor1, louvor2, louvor3, louvor4, louvor5]
+import FormCulto from '../components/cultos/FormCulto'
+import { useAuth } from '../context/AuthContext'
+import '../App.css'
 
 function Cultos() {
+  const { user } = useAuth()
+  // Verifica permissão (Pastor ou Admin)
+  const isStaff = user?.role === 'PASTOR' || user?.role === 'ADMIN'
+
+  const [cultos, setCultos] = useState([])
+  const [mostrarForm, setMostrarForm] = useState(false)
+
+  useEffect(() => {
+    carregarCultos()
+  }, [])
+
+  const carregarCultos = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+    fetch(`${apiUrl}/api/cultos`)
+      .then(res => res.json())
+      .then(data => setCultos(data))
+      .catch(console.error)
+  }
+
+  const handleSalvar = (dadosForm) => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+    
+    fetch(`${apiUrl}/api/cultos`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify(dadosForm)
+    })
+    .then(res => {
+        if(res.ok) {
+            alert("Foto adicionada com sucesso!")
+            setMostrarForm(false)
+            carregarCultos()
+        } else {
+            alert("Erro ao salvar.")
+        }
+    })
+  }
+
+  const handleExcluir = (id) => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+    fetch(`${apiUrl}/api/cultos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${user.token}` }
+    })
+    .then(() => carregarCultos())
+  }
+
+  // --- FILTROS (Separa os dados em duas listas) ---
+  // Se o culto não tiver tipo (antigos), assume PREGACAO por padrão
+  const listaPregacao = cultos.filter(c => c.tipo === 'PREGACAO' || !c.tipo)
+  const listaLouvor = cultos.filter(c => c.tipo === 'LOUVOR')
+
   return (
     <div className="main-content">
       <h1 className="page-title">Momentos dos Cultos</h1>
-      <p style={{textAlign: 'center', marginBottom: '40px', color: '#666'}}>
+      <p style={{textAlign: 'center', marginBottom: '30px', color: '#666'}}>
         Venha participar e ser abençoado pela palavra de Deus.
       </p>
 
-      {/* --- SEÇÃO 1: PREGAÇÃO --- */}
+      {/* BOTÃO DE ADICIONAR (Visível apenas para Staff) */}
+      {isStaff && (
+        <div style={{textAlign:'center', marginBottom:'40px'}}>
+            <button className="btn-primary" onClick={() => setMostrarForm(!mostrarForm)}>
+                {mostrarForm ? 'Cancelar' : '+ Adicionar Nova Foto'}
+            </button>
+        </div>
+      )}
+
+      {/* Formulário (Aparece ao clicar no botão) */}
+      {mostrarForm && isStaff && (
+        <FormCulto 
+            aoSalvar={handleSalvar} 
+            aoCancelar={() => setMostrarForm(false)} 
+        />
+      )}
+
+      {/* --- CARROSSEL 1: PREGAÇÃO --- */}
       <section style={{marginBottom: '60px'}}>
         <Carrossel 
             titulo="Pregação" 
-            imagens={imagensPregacao} 
+            dados={listaPregacao} 
+            podeEditar={isStaff}
+            aoExcluir={handleExcluir}
         />
       </section>
 
-      {/* Linha divisória elegante (Opcional) */}
-      <hr style={{maxWidth: '200px', margin: '0 auto 60px auto', border: '1px solid #f1c40f'}} />
-
-      {/* --- SEÇÃO 2: LOUVOR --- */}
+      {/* --- CARROSSEL 2: LOUVOR --- */}
       <section style={{marginBottom: '60px'}}>
         <Carrossel 
             titulo="Louvor" 
-            imagens={imagensLouvor} 
+            dados={listaLouvor} 
+            podeEditar={isStaff}
+            aoExcluir={handleExcluir}
         />
       </section>
+
     </div>
   )
 }

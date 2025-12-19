@@ -39,6 +39,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/contatos").permitAll()
 
+                        //CULTOS
+                        .requestMatchers(HttpMethod.GET, "/api/cultos").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/cultos").hasAnyRole("ADMIN", "PASTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/cultos/**").hasAnyRole("ADMIN", "PASTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/cultos/**").hasAnyRole("ADMIN", "PASTOR")
+
                         // LEITURA PÚBLICA
                         .requestMatchers(HttpMethod.GET, "/api/louvores").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cultos").permitAll()

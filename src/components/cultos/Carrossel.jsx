@@ -1,33 +1,50 @@
 import React, { useState, useEffect } from 'react'
 import './Carrossel.css'
 
-// O componente agora recebe 'titulo' e 'imagens' como propriedades (Props)
-function Carrossel({ titulo, imagens }) {
+function Carrossel({ titulo, dados, podeEditar, aoExcluir }) {
   const [indiceAtual, setIndiceAtual] = useState(0)
   const [imagemExpandida, setImagemExpandida] = useState(null)
+  
+  // NOVO ESTADO: Controla se o mouse está em cima
+  const [pausado, setPausado] = useState(false)
 
-  // Segurança: Se não vier imagens, usa array vazio para não quebrar
-  const listaImagens = imagens || []
+  const listaDados = dados || []
 
   const proximaFoto = () => {
-    setIndiceAtual((prev) => (prev === listaImagens.length - 1 ? 0 : prev + 1))
+    setIndiceAtual((prev) => (prev === listaDados.length - 1 ? 0 : prev + 1))
   }
 
   const fotoAnterior = () => {
-    setIndiceAtual((prev) => (prev === 0 ? listaImagens.length - 1 : prev - 1))
+    setIndiceAtual((prev) => (prev === 0 ? listaDados.length - 1 : prev - 1))
   }
 
   useEffect(() => {
+    // Só roda o timer se:
+    // 1. Tiver fotos
+    // 2. Não estiver com zoom aberto
+    // 3. NÃO estiver com o mouse em cima (pausado)
+    if (listaDados.length === 0 || imagemExpandida || pausado) return
+
     const intervalo = setInterval(proximaFoto, 5000)
     return () => clearInterval(intervalo)
-  }, [indiceAtual])
+  }, [indiceAtual, imagemExpandida, listaDados, pausado]) // Adicionado 'pausado' nas dependências
+
+  if (listaDados.length === 0) {
+    return (
+        <div className="carrossel-wrapper">
+            <h2 className="carrossel-titulo">{titulo}</h2>
+            <p style={{color:'#666', fontStyle:'italic', padding:'20px'}}>
+                Nenhuma foto cadastrada ainda.
+            </p>
+        </div>
+    )
+  }
 
   const getClasseImagem = (index) => {
     if (index === indiceAtual) return 'slide ativo'
-
-    const total = listaImagens.length
     
-    // Cálculo circular para índices
+    const total = listaDados.length
+    
     const anterior = (indiceAtual - 1 + total) % total
     const proximo = (indiceAtual + 1) % total
     const anterior2 = (indiceAtual - 2 + total) % total
@@ -41,34 +58,41 @@ function Carrossel({ titulo, imagens }) {
     return 'slide oculto'
   }
 
-  const handleCliqueSlide = (index) => {
-    if (index === indiceAtual) {
-        setImagemExpandida(listaImagens[index])
-    } else {
-        setIndiceAtual(index)
-    }
-  }
-
-  // Se não houver imagens, não renderiza nada
-  if (listaImagens.length === 0) return null
+  const itemAtual = listaDados[indiceAtual]
 
   return (
-    <div className="carrossel-wrapper">
-      {/* Título dinâmico recebido via prop */}
+    <div 
+        className="carrossel-wrapper"
+        // NOVOS EVENTOS PARA PAUSAR
+        onMouseEnter={() => setPausado(true)}
+        onMouseLeave={() => setPausado(false)}
+    >
       <h2 className="carrossel-titulo">{titulo}</h2>
       
       <div className="carrossel-container">
         <button className="btn-seta esquerda" onClick={fotoAnterior}>❮</button>
         
         <div className="slides-stage">
-            {listaImagens.map((img, index) => (
+            {listaDados.map((item, index) => (
                 <div 
-                    key={index} 
+                    key={item.id || index} 
                     className={getClasseImagem(index)}
-                    onClick={() => handleCliqueSlide(index)}
-                    title={index === indiceAtual ? "Clique para ampliar" : "Clique para ver"}
+                    onClick={() => index === indiceAtual ? setImagemExpandida(item.urlImagem) : setIndiceAtual(index)}
                 >
-                    <img src={img} alt={`${titulo} ${index}`} />
+                    <img src={item.urlImagem} alt="Culto" />
+                    
+                    {podeEditar && index === indiceAtual && (
+                        <button 
+                            className="btn-delete-foto"
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                if(confirm('Excluir esta foto?')) aoExcluir(item.id)
+                            }}
+                            title="Excluir foto"
+                        >
+                            🗑️
+                        </button>
+                    )}
                 </div>
             ))}
         </div>
@@ -76,20 +100,25 @@ function Carrossel({ titulo, imagens }) {
         <button className="btn-seta direita" onClick={proximaFoto}>❯</button>
       </div>
 
-      <div className="indicadores">
-        {listaImagens.map((_, index) => (
-            <span 
-                key={index} 
-                className={`bolinha ${index === indiceAtual ? 'ativa' : ''}`}
-                onClick={() => setIndiceAtual(index)}
-            ></span>
-        ))}
+      <div className="legenda-container">
+        <p className="legenda-texto">
+            {itemAtual?.descricao || "Sem descrição."}
+        </p>
+        <div className="indicadores">
+            {listaDados.map((_, index) => (
+                <span 
+                    key={index} 
+                    className={`bolinha ${index === indiceAtual ? 'ativa' : ''}`}
+                    onClick={() => setIndiceAtual(index)}
+                ></span>
+            ))}
+        </div>
       </div>
 
       {imagemExpandida && (
         <div className="lightbox-overlay" onClick={() => setImagemExpandida(null)}>
-            <button className="lightbox-close" onClick={() => setImagemExpandida(null)}>✖</button>
-            <img src={imagemExpandida} alt="Zoom" className="lightbox-img" onClick={(e) => e.stopPropagation()} />
+            <button className="lightbox-close">✖</button>
+            <img src={imagemExpandida} className="lightbox-img" onClick={(e) => e.stopPropagation()}/>
         </div>
       )}
     </div>
