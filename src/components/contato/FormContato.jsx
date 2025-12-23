@@ -2,40 +2,55 @@ import React, { useState } from 'react'
 import './FormContato.css'
 
 function FormContato() {
-  // Estado para armazenar os dados dos campos
   const [dados, setDados] = useState({
-    nome: '',
-    celular: '',
-    cidade: '',
-    motivo: ''
+    nome: '', celular: '', cidade: '', motivo: ''
   })
-
-  // Estado para controlar se o formulário está visível (Acordeão)
+  
   const [formAberto, setFormAberto] = useState(false)
-
-  // Estado para bloquear o botão enquanto envia
   const [enviando, setEnviando] = useState(false)
 
-  // Atualiza o estado quando o usuário digita
-  const handleChange = (e) => {
-    setDados({ ...dados, [e.target.name]: e.target.value })
+  // NOVO ESTADO: Verifica se o usuário já clicou e saiu do campo
+  const [celularTocado, setCelularTocado] = useState(false)
+
+  const mascaraCelular = (valor) => {
+    return valor
+      .replace(/\D/g, '')
+      .replace(/^(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
   }
 
-  // Envia os dados para o Backend
+  const handleChange = (e) => {
+    let { name, value } = e.target
+    if (name === 'celular') {
+        value = mascaraCelular(value)
+    }
+    setDados({ ...dados, [name]: value })
+  }
+
+  // NOVA FUNÇÃO: Chamada quando clica fora do campo
+  const handleBlurCelular = () => {
+    setCelularTocado(true)
+  }
+
+  // Verifica se existe erro para mostrar na tela
+  const erroCelular = celularTocado && dados.celular.length < 15
+
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // Validação básica
-    if (!dados.nome || !dados.celular) {
-      alert("Por favor, preencha Nome e Celular.")
+    // Validação também no envio (caso a pessoa ignore o aviso visual)
+    if (!dados.nome || dados.celular.length < 15) {
+      // Se não tocou no campo ainda, marca como tocado para mostrar o erro vermelho
+      setCelularTocado(true) 
+      alert("Por favor, preencha o Nome e um Celular válido.")
       return
     }
 
-    setEnviando(true) // Bloqueia o botão e muda o texto
+    setEnviando(true)
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-    // Chamada para a API Java (Rodando localmente)
     fetch(`${apiUrl}/api/contatos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,39 +58,35 @@ function FormContato() {
     })
     .then(res => {
         if(res.ok) {
-            alert(`Obrigado, ${dados.nome}! Sua mensagem foi enviada com sucesso.`)
-            // Limpa o formulário
+            alert(`Obrigado, ${dados.nome}! Sua mensagem foi enviada.`)
             setDados({ nome: '', celular: '', cidade: '', motivo: '' })
-            // Fecha o acordeão
+            setCelularTocado(false) // Reseta o erro
             setFormAberto(false)
         } else {
-            alert("Ocorreu um erro ao enviar. Tente novamente.")
+            alert("Erro ao enviar. Tente novamente.")
         }
     })
     .catch(error => {
-        console.error("Erro na requisição:", error)
-        alert("Erro de conexão com o servidor. Verifique se o backend está rodando.")
+        console.error(error)
+        alert("Erro de conexão com o servidor.")
     })
     .finally(() => {
-        setEnviando(false) // Libera o botão novamente
+        setEnviando(false)
     })
   }
 
   return (
     <div className="form-contato-container">
       
-      {/* Cabeçalho Clicável (Lógica do Acordeão) */}
       <div 
         className="form-header-accordion" 
         onClick={() => setFormAberto(!formAberto)}
         title={formAberto ? "Clique para fechar" : "Clique para abrir o formulário"}
       >
         <h2 className="titulo-form">✉️ Desejo receber contato</h2>
-        {/* A seta gira dependendo se está aberto ou fechado */}
         <span className={`seta-form ${formAberto ? 'aberta' : ''}`}>▼</span>
       </div>
       
-      {/* O formulário só é renderizado se formAberto for true */}
       {formAberto && (
         <form onSubmit={handleSubmit} className="form-grid form-animado">
             
@@ -97,10 +108,17 @@ function FormContato() {
                     type="tel" 
                     name="celular" 
                     value={dados.celular} 
-                    onChange={handleChange} 
-                    placeholder="(DDD) 99999-9999" 
+                    onChange={handleChange}
+                    onBlur={handleBlurCelular} // <--- A MÁGICA ACONTECE AQUI
+                    placeholder="(00) 00000-0000" 
+                    maxLength="15" 
                     required 
+                    className={erroCelular ? "input-erro" : ""}
                 />
+                {/* MENSAGEM DE ERRO CONDICIONAL */}
+                {erroCelular && (
+                    <span className="msg-erro">Digite o número completo com DDD.</span>
+                )}
             </div>
 
             <div className="campo">

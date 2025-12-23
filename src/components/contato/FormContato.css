@@ -49,6 +49,26 @@
     padding-top: 20px;
 }
 
+/* Borda vermelha quando tiver erro */
+.input-erro {
+    border-color: #e74c3c !important; /* Vermelho */
+    background-color: #fff5f5;
+}
+
+/* Texto de aviso */
+.msg-erro {
+    color: #e74c3c;
+    font-size: 0.75rem; /* Fonte um pouquinho menor */
+    font-weight: bold;
+    
+    /* MÁGICA PARA NÃO EMPURRAR O LAYOUT: */
+    position: absolute;
+    bottom: -20px; /* Empurra para fora do container, logo abaixo */
+    left: 0;
+    width: 100%;
+    white-space: nowrap;
+}
+
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -58,7 +78,7 @@
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 30px;
 }
 
 @media (max-width: 600px) {
@@ -69,6 +89,7 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: relative;
 }
 
 .campo.full-width { grid-column: 1 / -1; }
