@@ -1,21 +1,17 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { preCarregarLeituraDiaria } from '../utils/bibliaPreloader'; // <--- IMPORTANTE
+import { preCarregarLeituraDiaria } from '../utils/bibliaPreloader';
+import Swal from 'sweetalert2'; // <--- 1. IMPORTAR AQUI
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // null = Visitante
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Ao abrir o site, verifica se tem usuário salvo
     const savedUser = localStorage.getItem('cemv_user');
     
     if (savedUser) {
       setUser(JSON.parse(savedUser));
-
-      // --- PERFORMANCE: PRÉ-CARREGAMENTO ---
-      // Se o usuário já está logado, esperamos 1 segundo (para o site renderizar)
-      // e então começamos a baixar os capítulos da Bíblia de hoje em background.
       setTimeout(() => {
           preCarregarLeituraDiaria();
       }, 1000);
@@ -32,11 +28,9 @@ export function AuthProvider({ children }) {
       });
 
       if (response.ok) {
-        const data = await response.json(); 
-        // data agora contém: { token, nome, role, email }
-        
-        setUser(data);
-        localStorage.setItem('cemv_user', JSON.stringify(data));
+        const userData = await response.json();
+        setUser(userData);
+        localStorage.setItem('cemv_user', JSON.stringify(userData));
         return true;
       } else {
         return false;
@@ -47,11 +41,38 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // --- 2. FUNÇÃO LOGOUT ATUALIZADA (COM SWEETALERT) ---
   const logout = () => {
-    if (window.confirm("Tem certeza que deseja sair da sua conta?")) {
+    Swal.fire({
+      title: 'Deseja sair?',
+      text: "Você precisará fazer login novamente para acessar a área administrativa.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#2b0505', // Vinho (Cor da Igreja)
+      cancelButtonColor: '#6c757d',  // Cinza
+      confirmButtonText: 'Sim, sair',
+      cancelButtonText: 'Cancelar',
+      background: '#fff',
+      iconColor: '#f1c40f' // Dourado
+    }).then((result) => {
+      if (result.isConfirmed) {
         setUser(null);
         localStorage.removeItem('cemv_user');
-    }
+        
+        // Opcional: Feedback visual de saída
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'Logout realizado com sucesso'
+        });
+      }
+    });
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Swal from 'sweetalert2' // <--- IMPORTANTE
 import './FormContato.css'
 
 function FormContato() {
@@ -8,8 +9,6 @@ function FormContato() {
   
   const [formAberto, setFormAberto] = useState(false)
   const [enviando, setEnviando] = useState(false)
-
-  // NOVO ESTADO: Verifica se o usuário já clicou e saiu do campo
   const [celularTocado, setCelularTocado] = useState(false)
 
   const mascaraCelular = (valor) => {
@@ -22,28 +21,28 @@ function FormContato() {
 
   const handleChange = (e) => {
     let { name, value } = e.target
-    if (name === 'celular') {
-        value = mascaraCelular(value)
-    }
+    if (name === 'celular') value = mascaraCelular(value)
     setDados({ ...dados, [name]: value })
   }
 
-  // NOVA FUNÇÃO: Chamada quando clica fora do campo
   const handleBlurCelular = () => {
     setCelularTocado(true)
   }
 
-  // Verifica se existe erro para mostrar na tela
   const erroCelular = celularTocado && dados.celular.length < 15
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // Validação também no envio (caso a pessoa ignore o aviso visual)
     if (!dados.nome || dados.celular.length < 15) {
-      // Se não tocou no campo ainda, marca como tocado para mostrar o erro vermelho
-      setCelularTocado(true) 
-      alert("Por favor, preencha o Nome e um Celular válido.")
+      setCelularTocado(true)
+      // --- ALERTA DE ERRO PERSONALIZADO ---
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção',
+        text: 'Por favor, preencha o Nome e um Celular válido.',
+        confirmButtonColor: '#2b0505' // Cor Vinho da Igreja
+      })
       return
     }
 
@@ -58,17 +57,36 @@ function FormContato() {
     })
     .then(res => {
         if(res.ok) {
-            alert(`Obrigado, ${dados.nome}! Sua mensagem foi enviada.`)
+            // --- ALERTA DE SUCESSO PERSONALIZADO ---
+            Swal.fire({
+                icon: 'success',
+                title: 'Mensagem Enviada!',
+                text: `Obrigado, ${dados.nome}! Entraremos em contato em breve.`,
+                confirmButtonColor: '#2b0505',
+                background: '#fff',
+                iconColor: '#27ae60'
+            })
+            
             setDados({ nome: '', celular: '', cidade: '', motivo: '' })
-            setCelularTocado(false) // Reseta o erro
+            setCelularTocado(false)
             setFormAberto(false)
         } else {
-            alert("Erro ao enviar. Tente novamente.")
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível enviar. Tente novamente mais tarde.',
+                confirmButtonColor: '#a82626'
+            })
         }
     })
     .catch(error => {
         console.error(error)
-        alert("Erro de conexão com o servidor.")
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro de Conexão',
+            text: 'Verifique sua internet ou tente mais tarde.',
+            confirmButtonColor: '#a82626'
+        })
     })
     .finally(() => {
         setEnviando(false)
@@ -77,7 +95,6 @@ function FormContato() {
 
   return (
     <div className="form-contato-container">
-      
       <div 
         className="form-header-accordion" 
         onClick={() => setFormAberto(!formAberto)}
@@ -92,64 +109,34 @@ function FormContato() {
             
             <div className="campo">
                 <label>Nome *</label>
-                <input 
-                    type="text" 
-                    name="nome" 
-                    value={dados.nome} 
-                    onChange={handleChange} 
-                    placeholder="Seu nome completo" 
-                    required 
-                />
+                <input type="text" name="nome" value={dados.nome} onChange={handleChange} placeholder="Seu nome completo" required />
             </div>
 
             <div className="campo">
                 <label>Celular *</label>
                 <input 
-                    type="tel" 
-                    name="celular" 
-                    value={dados.celular} 
-                    onChange={handleChange}
-                    onBlur={handleBlurCelular} // <--- A MÁGICA ACONTECE AQUI
-                    placeholder="(00) 00000-0000" 
-                    maxLength="15" 
-                    required 
+                    type="tel" name="celular" value={dados.celular} onChange={handleChange} onBlur={handleBlurCelular}
+                    placeholder="(00) 00000-0000" maxLength="15" required 
                     className={erroCelular ? "input-erro" : ""}
                 />
-                {/* MENSAGEM DE ERRO CONDICIONAL */}
-                {erroCelular && (
-                    <span className="msg-erro">Digite o número completo com DDD.</span>
-                )}
+                {erroCelular && <span className="msg-erro">Digite o número completo com DDD.</span>}
             </div>
 
             <div className="campo">
                 <label>Cidade</label>
-                <input 
-                    type="text" 
-                    name="cidade" 
-                    value={dados.cidade} 
-                    onChange={handleChange} 
-                    placeholder="Ex: Araraquara"
-                />
+                <input type="text" name="cidade" value={dados.cidade} onChange={handleChange} placeholder="Ex: Araraquara"/>
             </div>
 
             <div className="campo full-width">
                 <label>Motivo do contato</label>
-                <textarea 
-                    name="motivo" 
-                    value={dados.motivo} 
-                    onChange={handleChange} 
-                    rows="3" 
-                    placeholder="Pedido de oração, visita, dúvida..."
-                ></textarea>
+                <textarea name="motivo" value={dados.motivo} onChange={handleChange} rows="3" placeholder="Pedido de oração, visita, dúvida..."></textarea>
             </div>
 
             <button type="submit" className="btn-enviar full-width" disabled={enviando}>
                 {enviando ? 'Enviando...' : 'Enviar Mensagem'}
             </button>
-
         </form>
       )}
-
     </div>
   )
 }
