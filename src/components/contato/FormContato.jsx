@@ -33,8 +33,10 @@ function FormContato() {
 
     setEnviando(true) // Bloqueia o botão e muda o texto
 
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
     // Chamada para a API Java (Rodando localmente)
-    fetch('http://localhost:8080/api/contatos', {
+    fetch(`${apiUrl}/api/contatos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
