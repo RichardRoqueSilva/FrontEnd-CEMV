@@ -212,6 +212,42 @@
 .bg-azul { background-color: #bbdefb; }
 .bg-rosa { background-color: #f8bbd0; }
 
+/* --- NAVEGAÇÃO DE CAPÍTULOS (RODAPÉ) --- */
+.nav-capitulos {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-nav {
+    background-color: white;
+    color: #2b0505;
+    border: 1px solid #2b0505;
+    padding: 10px 20px;
+    border-radius: 25px; /* Botão arredondado */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.btn-nav:hover {
+    background-color: #2b0505;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-nav:disabled {
+    cursor: not-allowed;
+    border-color: #ccc;
+    color: #ccc;
+    transform: none;
+    box-shadow: none;
+}
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* --- RESPONSIVIDADE --- */
@@ -225,4 +261,13 @@
     .versiculos-lista { font-size: 1.1rem; text-align: left; }
     
     .form-box-row { gap: 10px; }
+
+    .nav-capitulos {
+        margin-top: 30px;
+    }
+    
+    .btn-nav {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+    }
 }
